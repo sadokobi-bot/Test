@@ -1,1 +1,1613 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snir & Michal | לוח בקרה חכם לניתוח מכירות</title>
+    <script src="https://public.tableau.com/javascripts/api/tableau-2.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&family=Rubik:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1a1a2e;
+            --secondary: #16213e;
+            --accent: #0f3460;
+            --highlight: #e94560;
+            --gold: #f5a623;
+            --light: #f0f0f5;
+            --glass: rgba(255, 255, 255, 0.08);
+            --glass-border: rgba(255, 255, 255, 0.12);
+            --gradient-1: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            --gradient-2: linear-gradient(135deg, #e94560, #f5a623);
+            --gradient-3: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Heebo', 'Rubik', sans-serif;
+            background: var(--primary);
+            color: #ffffff;
+            overflow-x: hidden;
+            line-height: 1.8;
+        }
+
+        /* Animated Background */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .bg-animation .particle {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.15;
+            animation: floatParticle linear infinite;
+        }
+
+        @keyframes floatParticle {
+            0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.15; }
+            90% { opacity: 0.15; }
+            100% { transform: translateY(-100px) rotate(720deg); opacity: 0; }
+        }
+
+        /* Navbar */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            padding: 15px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(26, 26, 46, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border);
+            transition: all 0.4s ease;
+        }
+
+        .navbar.scrolled {
+            padding: 10px 40px;
+            background: rgba(26, 26, 46, 0.95);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: #fff;
+        }
+
+        .nav-logo-icon {
+            width: 42px;
+            height: 42px;
+            background: var(--gradient-2);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: 900;
+            color: #fff;
+            box-shadow: 0 4px 15px rgba(233, 69, 96, 0.4);
+        }
+
+        .nav-logo-text {
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .nav-logo-text span {
+            background: var(--gradient-2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 8px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: rgba(255, 255, 255, 0.75);
+            text-decoration: none;
+            padding: 8px 18px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-links a:hover, .nav-links a.active {
+            color: #fff;
+            background: var(--glass);
+        }
+
+        .nav-links a.active {
+            background: rgba(233, 69, 96, 0.2);
+            color: #e94560;
+        }
+
+        .mobile-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 8px;
+            transition: background 0.3s;
+        }
+
+        .mobile-toggle:hover {
+            background: var(--glass);
+        }
+
+        /* Hero Section */
+        .hero {
+            position: relative;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 120px 40px 80px;
+            overflow: hidden;
+        }
+
+        .hero-bg-gradient {
+            position: absolute;
+            top: -50%;
+            right: -30%;
+            width: 80%;
+            height: 150%;
+            background: radial-gradient(ellipse, rgba(233, 69, 96, 0.12) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .hero-bg-gradient-2 {
+            position: absolute;
+            bottom: -30%;
+            left: -20%;
+            width: 60%;
+            height: 100%;
+            background: radial-gradient(ellipse, rgba(245, 166, 35, 0.08) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            max-width: 900px;
+            text-align: center;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 20px;
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 50px;
+            font-size: 13px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+            animation: fadeInDown 0.8s ease forwards;
+        }
+
+        .hero-badge .dot {
+            width: 8px;
+            height: 8px;
+            background: #4ade80;
+            border-radius: 50%;
+            animation: pulse-dot 2s ease infinite;
+        }
+
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.5); }
+        }
+
+        .hero-title {
+            font-size: clamp(36px, 6vw, 72px);
+            font-weight: 900;
+            line-height: 1.15;
+            margin-bottom: 24px;
+            animation: fadeInUp 0.8s ease 0.2s both;
+        }
+
+        .hero-title .gradient-text {
+            background: var(--gradient-2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-subtitle {
+            font-size: clamp(16px, 2.5vw, 22px);
+            color: rgba(255, 255, 255, 0.65);
+            font-weight: 300;
+            line-height: 1.7;
+            max-width: 700px;
+            margin: 0 auto 40px;
+            animation: fadeInUp 0.8s ease 0.4s both;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+            animation: fadeInUp 0.8s ease 0.6s both;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 32px;
+            border-radius: 14px;
+            font-size: 15px;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            font-family: inherit;
+        }
+
+        .btn-primary {
+            background: var(--gradient-2);
+            color: #fff;
+            box-shadow: 0 8px 30px rgba(233, 69, 96, 0.35);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 40px rgba(233, 69, 96, 0.5);
+        }
+
+        .btn-secondary {
+            background: var(--glass);
+            color: #fff;
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(10px);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-3px);
+        }
+
+        .hero-scroll-indicator {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 12px;
+            animation: bounce 2s ease infinite;
+        }
+
+        .scroll-line {
+            width: 1px;
+            height: 40px;
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.4), transparent);
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateX(-50%) translateY(0); }
+            50% { transform: translateX(-50%) translateY(10px); }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Stats Bar */
+        .stats-bar {
+            position: relative;
+            z-index: 2;
+            padding: 0 40px;
+            margin-top: -40px;
+            margin-bottom: 80px;
+        }
+
+        .stats-container {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+        }
+
+        .stat-card {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 28px 24px;
+            text-align: center;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            transition: all 0.4s ease;
+            opacity: 0;
+            animation: fadeInUp 0.6s ease forwards;
+        }
+
+        .stat-card:nth-child(1) { animation-delay: 0.1s; }
+        .stat-card:nth-child(2) { animation-delay: 0.2s; }
+        .stat-card:nth-child(3) { animation-delay: 0.3s; }
+        .stat-card:nth-child(4) { animation-delay: 0.4s; }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(233, 69, 96, 0.3);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 14px;
+            font-size: 22px;
+        }
+
+        .stat-icon.red { background: rgba(233, 69, 96, 0.15); }
+        .stat-icon.gold { background: rgba(245, 166, 35, 0.15); }
+        .stat-icon.purple { background: rgba(102, 126, 234, 0.15); }
+        .stat-icon.green { background: rgba(74, 222, 128, 0.15); }
+
+        .stat-number {
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 4px;
+            background: var(--gradient-2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.5);
+            font-weight: 400;
+        }
+
+        /* Sections */
+        .section {
+            position: relative;
+            z-index: 2;
+            padding: 80px 40px;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .section-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 16px;
+            background: rgba(233, 69, 96, 0.1);
+            border: 1px solid rgba(233, 69, 96, 0.2);
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #e94560;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 16px;
+        }
+
+        .section-title {
+            font-size: clamp(28px, 4vw, 44px);
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 16px;
+        }
+
+        .section-desc {
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.55);
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.8;
+        }
+
+        /* Tableau Dashboard */
+        .dashboard-section {
+            padding: 0 40px 100px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .dashboard-wrapper {
+            max-width: 1300px;
+            margin: 0 auto;
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            overflow: hidden;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .dashboard-toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 24px;
+            background: rgba(0, 0, 0, 0.2);
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .toolbar-dots {
+            display: flex;
+            gap: 8px;
+        }
+
+        .toolbar-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .toolbar-dot.red { background: #ff5f57; }
+        .toolbar-dot.yellow { background: #febc2e; }
+        .toolbar-dot.green { background: #28c840; }
+
+        .toolbar-title {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.5);
+            font-weight: 500;
+        }
+
+        .toolbar-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .toolbar-btn {
+            padding: 6px 14px;
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+
+        .toolbar-btn:hover {
+            background: rgba(255, 255, 255, 0.12);
+            color: #fff;
+        }
+
+        .dashboard-container {
+            padding: 20px;
+            min-height: 800px;
+        }
+
+        #tableauViz {
+            width: 100%;
+            min-height: 760px;
+        }
+
+        .tableau-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 760px;
+            gap: 20px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .placeholder-spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid var(--glass-border);
+            border-top-color: #e94560;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Features */
+        .features-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+        }
+
+        .feature-card {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 36px 28px;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--gradient-2);
+            opacity: 0;
+            transition: opacity 0.4s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px);
+            border-color: rgba(233, 69, 96, 0.25);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+        }
+
+        .feature-card:hover::before {
+            opacity: 1;
+        }
+
+        .feature-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            margin-bottom: 20px;
+        }
+
+        .feature-icon.red { background: rgba(233, 69, 96, 0.12); }
+        .feature-icon.gold { background: rgba(245, 166, 35, 0.12); }
+        .feature-icon.purple { background: rgba(102, 126, 234, 0.12); }
+        .feature-icon.blue { background: rgba(56, 189, 248, 0.12); }
+        .feature-icon.green { background: rgba(74, 222, 128, 0.12); }
+        .feature-icon.pink { background: rgba(236, 72, 153, 0.12); }
+
+        .feature-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .feature-desc {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.5);
+            line-height: 1.7;
+        }
+
+        /* About Section */
+        .about-grid {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+        }
+
+        .about-image {
+            position: relative;
+        }
+
+        .about-image-card {
+            background: var(--gradient-3);
+            border-radius: 24px;
+            padding: 50px 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .about-image-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
+            animation: rotateBg 15s linear infinite;
+        }
+
+        @keyframes rotateBg {
+            to { transform: rotate(360deg); }
+        }
+
+        .about-image-card .big-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .about-image-card h3 {
+            font-size: 24px;
+            font-weight: 700;
+            position: relative;
+            z-index: 1;
+        }
+
+        .about-image-card p {
+            font-size: 15px;
+            opacity: 0.8;
+            position: relative;
+            z-index: 1;
+            margin-top: 8px;
+        }
+
+        .about-text h2 {
+            font-size: 36px;
+            font-weight: 800;
+            margin-bottom: 20px;
+            line-height: 1.3;
+        }
+
+        .about-text h2 .gradient-text {
+            background: var(--gradient-2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .about-text p {
+            font-size: 15px;
+            color: rgba(255, 255, 255, 0.6);
+            line-height: 1.9;
+            margin-bottom: 16px;
+        }
+
+        .about-list {
+            list-style: none;
+            margin-top: 24px;
+        }
+
+        .about-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 14px;
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .about-list li .check {
+            flex-shrink: 0;
+            width: 22px;
+            height: 22px;
+            background: rgba(74, 222, 128, 0.15);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #4ade80;
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
+        /* Creators Section */
+        .creators-section {
+            padding: 80px 40px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .creators-grid {
+            max-width: 800px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        .creator-card {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 40px 30px;
+            text-align: center;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .creator-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(233, 69, 96, 0.3);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .creator-avatar {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            font-weight: 800;
+            position: relative;
+        }
+
+        .creator-avatar.snir {
+            background: linear-gradient(135deg, #1a1a2e, #0f3460);
+            border: 3px solid rgba(233, 69, 96, 0.3);
+            color: #e94560;
+        }
+
+        .creator-avatar.michal {
+            background: linear-gradient(135deg, #1a1a2e, #0f3460);
+            border: 3px solid rgba(245, 166, 35, 0.3);
+            color: #f5a623;
+        }
+
+        .creator-avatar::after {
+            content: '';
+            position: absolute;
+            inset: -6px;
+            border-radius: 50%;
+            border: 2px dashed rgba(255, 255, 255, 0.1);
+            animation: spin 20s linear infinite;
+        }
+
+        .creator-name {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .creator-role {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.5);
+            margin-bottom: 16px;
+        }
+
+        .creator-desc {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.45);
+            line-height: 1.7;
+        }
+
+        /* CTA Section */
+        .cta-section {
+            padding: 80px 40px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .cta-card {
+            max-width: 900px;
+            margin: 0 auto;
+            background: var(--gradient-3);
+            border-radius: 28px;
+            padding: 60px 50px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-card::before {
+            content: '';
+            position: absolute;
+            top: -100px;
+            right: -100px;
+            width: 300px;
+            height: 300px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 50%;
+        }
+
+        .cta-card::after {
+            content: '';
+            position: absolute;
+            bottom: -80px;
+            left: -80px;
+            width: 250px;
+            height: 250px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 50%;
+        }
+
+        .cta-card h2 {
+            font-size: clamp(24px, 4vw, 36px);
+            font-weight: 800;
+            margin-bottom: 16px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .cta-card p {
+            font-size: 16px;
+            opacity: 0.85;
+            margin-bottom: 30px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .cta-card .btn {
+            position: relative;
+            z-index: 1;
+        }
+
+        .btn-white {
+            background: #fff;
+            color: #764ba2;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-white:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Footer */
+        .footer {
+            position: relative;
+            z-index: 2;
+            padding: 40px;
+            border-top: 1px solid var(--glass-border);
+            text-align: center;
+        }
+
+        .footer-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .footer-logo {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .footer-logo-icon {
+            width: 36px;
+            height: 36px;
+            background: var(--gradient-2);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: 900;
+        }
+
+        .footer-logo-text {
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .footer-text {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.4);
+            margin-bottom: 8px;
+        }
+
+        .footer-credits {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        .footer-credits span {
+            background: var(--gradient-2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 600;
+        }
+
+        /* Animations for scroll */
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .features-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 12px 20px;
+            }
+
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: rgba(26, 26, 46, 0.98);
+                backdrop-filter: blur(20px);
+                flex-direction: column;
+                padding: 20px;
+                border-bottom: 1px solid var(--glass-border);
+            }
+
+            .nav-links.open {
+                display: flex;
+            }
+
+            .mobile-toggle {
+                display: block;
+            }
+
+            .hero {
+                padding: 100px 20px 60px;
+            }
+
+            .stats-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .stats-bar {
+                padding: 0 20px;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .about-grid {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+
+            .creators-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .dashboard-section {
+                padding: 0 10px 60px;
+            }
+
+            .dashboard-wrapper {
+                border-radius: 16px;
+            }
+
+            .dashboard-container {
+                padding: 10px;
+            }
+
+            #tableauViz {
+                min-height: 600px;
+            }
+
+            .section {
+                padding: 60px 20px;
+            }
+
+            .cta-card {
+                padding: 40px 24px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stats-container {
+                grid-template-columns: 1fr 1fr;
+                gap: 12px;
+            }
+
+            .stat-card {
+                padding: 20px 16px;
+            }
+
+            .stat-number {
+                font-size: 22px;
+            }
+
+            .hero-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+                max-width: 280px;
+            }
+        }
+
+        /* Tableau loading state */
+        .viz-loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 600px;
+        }
+
+        .loading-content {
+            text-align: center;
+        }
+
+        .loading-bars {
+            display: flex;
+            gap: 6px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .loading-bar {
+            width: 6px;
+            height: 30px;
+            background: var(--gradient-2);
+            border-radius: 3px;
+            animation: loadingBar 1.2s ease infinite;
+        }
+
+        .loading-bar:nth-child(2) { animation-delay: 0.1s; }
+        .loading-bar:nth-child(3) { animation-delay: 0.2s; }
+        .loading-bar:nth-child(4) { animation-delay: 0.3s; }
+        .loading-bar:nth-child(5) { animation-delay: 0.4s; }
+
+        @keyframes loadingBar {
+            0%, 100% { transform: scaleY(0.5); opacity: 0.5; }
+            50% { transform: scaleY(1.2); opacity: 1; }
+        }
+
+        /* Scroll to top */
+        .scroll-top {
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            width: 48px;
+            height: 48px;
+            background: var(--gradient-2);
+            border: none;
+            border-radius: 14px;
+            color: #fff;
+            font-size: 20px;
+            cursor: pointer;
+            z-index: 999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.4s ease;
+            box-shadow: 0 8px 25px rgba(233, 69, 96, 0.35);
+        }
+
+        .scroll-top.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .scroll-top:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(233, 69, 96, 0.5);
+        }
+
+        /* Divider */
+        .section-divider {
+            width: 60px;
+            height: 4px;
+            background: var(--gradient-2);
+            border-radius: 2px;
+            margin: 0 auto 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Animated Background Particles -->
+    <div class="bg-animation" id="bgAnimation"></div>
+
+    <!-- Navbar -->
+    <nav class="navbar" id="navbar">
+        <a href="#" class="nav-logo">
+            <div class="nav-logo-icon">S</div>
+            <div class="nav-logo-text"><span>Snir</span> & Michal</div>
+        </a>
+        <ul class="nav-links" id="navLinks">
+            <li><a href="#home" class="active">בית</a></li>
+            <li><a href="#dashboard">דשבורד</a></li>
+            <li><a href="#features">יכולות</a></li>
+            <li><a href="#about">אודות</a></li>
+            <li><a href="#creators">צוות</a></li>
+        </ul>
+        <button class="mobile-toggle" id="mobileToggle" aria-label="Toggle menu">☰</button>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="hero-bg-gradient"></div>
+        <div class="hero-bg-gradient-2"></div>
+        <div class="hero-content">
+            <div class="hero-badge">
+                <span class="dot"></span>
+                מערכת אנליטיקה חכמה בזמן אמת
+            </div>
+            <h1 class="hero-title">
+                לוח בקרה חכם<br>
+                ל<span class="gradient-text">ניתוח מכירות</span>
+            </h1>
+            <p class="hero-subtitle">
+                פלטפורמת בינה עסקית מתקדמת המאפשרת ניטור, ניתוח והבנה מעמיקה של נתוני מכירות — הכל במקום אחד, בתצוגה ויזואלית מרהיבה
+            </p>
+            <div class="hero-buttons">
+                <a href="#dashboard" class="btn btn-primary">
+                    📊 צפה בדשבורד
+                </a>
+                <a href="#features" class="btn btn-secondary">
+                    ✨ גלה את היכולות
+                </a>
+            </div>
+        </div>
+        <div class="hero-scroll-indicator">
+            <span>גלול למטה</span>
+            <div class="scroll-line"></div>
+        </div>
+    </section>
+
+    <!-- Stats Bar -->
+    <div class="stats-bar">
+        <div class="stats-container">
+            <div class="stat-card">
+                <div class="stat-icon red">📈</div>
+                <div class="stat-number" id="statRevenue">₪2.4M</div>
+                <div class="stat-label">סך הכנסות</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon gold">👥</div>
+                <div class="stat-number" id="statCustomers">1,250+</div>
+                <div class="stat-label">לקוחות פעילים</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon purple">🌍</div>
+                <div class="stat-number" id="statRegions">18</div>
+                <div class="stat-label">אזורים גיאוגרפיים</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon green">📦</div>
+                <div class="stat-number" id="statProducts">340+</div>
+                <div class="stat-label">מוצרים בקטלוג</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard Section -->
+    <section class="dashboard-section" id="dashboard">
+        <div class="section-header reveal">
+            <div class="section-tag">📊 לוח בקרה ראשי</div>
+            <h2 class="section-title">דשבורד אינטראקטיבי</h2>
+            <p class="section-desc">
+                חקור את נתוני המכירות שלנו באמצעות תרשימים דינמיים המעודכנים בזמן אמת. לחץ על כל רכיב לקבלת תובנות מעמיקות
+            </p>
+        </div>
+        <div class="dashboard-wrapper reveal">
+            <div class="dashboard-toolbar">
+                <div class="toolbar-dots">
+                    <div class="toolbar-dot red"></div>
+                    <div class="toolbar-dot yellow"></div>
+                    <div class="toolbar-dot green"></div>
+                </div>
+                <div class="toolbar-title">Snir & Michal Sales Dashboard</div>
+                <div class="toolbar-actions">
+                    <button class="toolbar-btn" onclick="resetViz()">🔄 רענן</button>
+                </div>
+            </div>
+            <div class="dashboard-container">
+                <div id="tableauViz">
+                    <div class="viz-loading">
+                        <div class="loading-content">
+                            <div class="loading-bars">
+                                <div class="loading-bar"></div>
+                                <div class="loading-bar"></div>
+                                <div class="loading-bar"></div>
+                                <div class="loading-bar"></div>
+                                <div class="loading-bar"></div>
+                            </div>
+                            <p style="color: rgba(255,255,255,0.5); font-size: 14px;">טוען את הדשבורד...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="section" id="features">
+        <div class="section-header reveal">
+            <div class="section-tag">⚡ יכולות המערכת</div>
+            <h2 class="section-title">מה אפשר לעשות כאן?</h2>
+            <p class="section-desc">
+                המערכת מציעה מגוון יכולות מתקדמות לניתוח ויזואלי של נתוני המכירות, המאפשרות קבלת החלטות מבוססת נתונים
+            </p>
+        </div>
+        <div class="features-grid">
+            <div class="feature-card reveal">
+                <div class="feature-icon red">📊</div>
+                <h3 class="feature-title">תרשימים דינמיים</h3>
+                <p class="feature-desc">תרשימי עמודות, קווים ועוגות המציגים מגמות מכירות לאורך זמן, עם אפשרות סינון והתאמה אישית</p>
+            </div>
+            <div class="feature-card reveal">
+                <div class="feature-icon gold">🗺️</div>
+                <h3 class="feature-title">ניתוח גיאוגרפי</h3>
+                <p class="feature-desc">מפות חום אינטראקטיביות המציגות פיזור מכירות לפי אזורים גיאוגרפיים, עם זיהוי אזורים חמים וקרים</p>
+            </div>
+            <div class="feature-card reveal">
+                <div class="feature-icon purple">📈</div>
+                <h3 class="feature-title">מגמות וצמיחה</h3>
+                <p class="feature-desc">מעקב אחר קצב צמיחת מכירות, זיהוי מגמות חיוביות ושליליות, וניתוח עונתיות לאורך השנים</p>
+            </div>
+            <div class="feature-card reveal">
+                <div class="feature-icon blue">🏷️</div>
+                <h3 class="feature-title">ניתוח קטגוריות</h3>
+                <p class="feature-desc">חלוקת מכירות לפי קטגוריות מוצרים, זיהוי המוצרים המובילים והזדמנויות צמיחה חדשות</p>
+            </div>
+            <div class="feature-card reveal">
+                <div class="feature-icon green">💰</div>
+                <h3 class="feature-title">ניתוח רווחיות</h3>
+                <p class="feature-desc">מעקב אחר שולי רווח, השוואה בין קטגוריות וזיהוי אזורי השיפור הפוטנציאליים</p>
+            </div>
+            <div class="feature-card reveal">
+                <div class="feature-icon pink">⚡</div>
+                <h3 class="feature-title">אינטראקטיביות מלאה</h3>
+                <p class="feature-desc">כל התרשימים מחוברים זה לזה — לחיצה על נתון אחד מעדכנת אוטומטית את כל שאר התרשימים</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="section" id="about">
+        <div class="about-grid">
+            <div class="about-image reveal">
+                <div class="about-image-card">
+                    <div class="big-icon">📊</div>
+                    <h3>Power of Data</h3>
+                    <p>הפיכת נתונים לתובנות עסקיות</p>
+                </div>
+            </div>
+            <div class="about-text reveal">
+                <h2>למה <span class="gradient-text">דשבורד</span> הוא הכלי הכי חזק שלך?</h2>
+                <p>
+                    בעולם העסקי של היום, קבלת החלטות מבוססת נתונים היא לא רק יתרון — היא חובה. 
+                    הדשבורד שלנו נבנה במיוחד כדי לספק תמונה מלאה, עדכנית וברורה של כל הפעילות העסקית.
+                </p>
+                <p>
+                    באמצעות Tableau Public, הפלטפורמה המובילה בעולם לבינה עסקית ויזואלית, 
+                    אנחנו מציגים את הנתונים בצורה שהופכת מורכבות לפשטות.
+                </p>
+                <ul class="about-list">
+                    <li>
+                        <span class="check">✓</span>
+                        <span>ניטור בזמן אמת של יעדי מכירות ו-KPIs קריטיים</span>
+                    </li>
+                    <li>
+                        <span class="check">✓</span>
+                        <span>זיהוי מגמות והזדמנויות עסקיות לפני המתחרים</span>
+                    </li>
+                    <li>
+                        <span class="check">✓</span>
+                        <span>חיסכון של שעות בעבודה ידנית עם דוחות אוטומטיים</span>
+                    </li>
+                    <li>
+                        <span class="check">✓</span>
+                        <span>תובנות ויזואליות שמובנות לכל דרג בארגון</span>
+                    </li>
+                    <li>
+                        <span class="check">✓</span>
+                        <span>יכולת סינון מתקדמת לחקירה מעמיקה של כל נתון</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Creators Section -->
+    <section class="creators-section" id="creators">
+        <div class="section-header reveal">
+            <div class="section-tag">👥 נוצר על ידי</div>
+            <h2 class="section-title">הצוות שמאחורי הפרויקט</h2>
+            <p class="section-desc">
+                שותפות מקצועית שמשלבת ידע, ניסיון וחדשנות ליצירת כלי אנליטי פורץ דרך
+            </p>
+        </div>
+        <div class="creators-grid">
+            <div class="creator-card reveal">
+                <div class="creator-avatar snir">ש</div>
+                <h3 class="creator-name">מר שניר</h3>
+                <p class="creator-role">מייסד שותף | מוביל אנליטיקה</p>
+                <p class="creator-desc">
+                    מומחה בניתוח נתונים ובינה עסקית. אחראי על ארכיטקטורת המידע, פיתוח תרשימים מתקדמים והפקת תובנות אסטרטגיות מהנתונים
+                </p>
+            </div>
+            <div class="creator-card reveal">
+                <div class="creator-avatar michal">מ</div>
+                <h3 class="creator-name">גברת מיכל</h3>
+                <p class="creator-role">מייסדת שותפת | מובילת מוצר</p>
+                <p class="creator-desc">
+                    מומחית בחוויית משתמש ועיצוב ויזואלי. אחראית על תכנון הממשק, עיצוב התצוגות והבטחת חוויית משתמש אינטואיטיבית ומרשימה
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <div class="cta-card reveal">
+            <h2>מוכנים לגלות את הכוח של הנתונים שלכם?</h2>
+            <p>התחילו לחקור את הדשבורד עכשיו וגלו תובנות שישנו את הדרך שבה אתם מבינים את העסק שלכם</p>
+            <a href="#dashboard" class="btn btn-white">
+                🚀 לדשבורד המלא
+            </a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-logo">
+                <div class="footer-logo-icon">S</div>
+                <div class="footer-logo-text">Snir & Michal</div>
+            </div>
+            <p class="footer-text">
+                לוח בקרה חכם לניתוח מכירות — פלטפורמת בינה עסקית מתקדמת
+            </p>
+            <p class="footer-credits">
+                פותח ונבנה על ידי <span>מר שניר</span> ו<span>גברת מיכל</span> | כל הזכויות שמורות © 2024
+            </p>
+        </div>
+    </footer>
+
+    <!-- Scroll to Top -->
+    <button class="scroll-top" id="scrollTop" aria-label="Scroll to top">↑</button>
+
+    <script>
+        // ============================================
+        // Background Particles
+        // ============================================
+        (function createParticles() {
+            const bg = document.getElementById('bgAnimation');
+            const colors = ['#e94560', '#f5a623', '#667eea', '#764ba2', '#4ade80'];
+            for (let i = 0; i < 30; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                const size = Math.random() * 8 + 3;
+                particle.style.width = size + 'px';
+                particle.style.height = size + 'px';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+                particle.style.animationDuration = (Math.random() * 20 + 15) + 's';
+                particle.style.animationDelay = (Math.random() * 10) + 's';
+                bg.appendChild(particle);
+            }
+        })();
+
+        // ============================================
+        // Navbar Scroll Effect
+        // ============================================
+        const navbar = document.getElementById('navbar');
+        const scrollTop = document.getElementById('scrollTop');
+
+        window.addEventListener('scroll', function() {
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+
+            if (window.scrollY > 500) {
+                scrollTop.classList.add('visible');
+            } else {
+                scrollTop.classList.remove('visible');
+            }
+
+            // Active nav link
+            const sections = ['home', 'dashboard', 'features', 'about', 'creators'];
+            for (let i = sections.length - 1; i >= 0; i--) {
+                const section = document.getElementById(sections[i]);
+                if (section) {
+                    const rect = section.getBoundingClientRect();
+                    if (rect.top <= 200) {
+                        document.querySelectorAll('.nav-links a').forEach(function(link) {
+                            link.classList.remove('active');
+                        });
+                        const activeLink = document.querySelector('.nav-links a[href="#' + sections[i] + '"]');
+                        if (activeLink) activeLink.classList.add('active');
+                        break;
+                    }
+                }
+            }
+        });
+
+        scrollTop.addEventListener('click', function() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        // ============================================
+        // Mobile Toggle
+        // ============================================
+        const mobileToggle = document.getElementById('mobileToggle');
+        const navLinks = document.getElementById('navLinks');
+
+        mobileToggle.addEventListener('click', function() {
+            navLinks.classList.toggle('open');
+            mobileToggle.textContent = navLinks.classList.contains('open') ? '✕' : '☰';
+        });
+
+        // Close mobile menu on link click
+        navLinks.querySelectorAll('a').forEach(function(link) {
+            link.addEventListener('click', function() {
+                navLinks.classList.remove('open');
+                mobileToggle.textContent = '☰';
+            });
+        });
+
+        // ============================================
+        // Scroll Reveal
+        // ============================================
+        const revealElements = document.querySelectorAll('.reveal');
+
+        const revealObserver = new IntersectionObserver(function(entries) {
+            entries.forEach(function(entry) {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+
+        revealElements.forEach(function(el) {
+            revealObserver.observe(el);
+        });
+
+        // ============================================
+        // Tableau Embed
+        // ============================================
+        var vizContainer = null;
+        var vizInstance = null;
+
+        function initTableau() {
+            var container = document.getElementById('tableauViz');
+            var vizUrl = 'https://public.tableau.com/views/SnirMichalSales/Dashboard1';
+            var options = {
+                hideTabs: false,
+                hideToolbar: false,
+                width: '100%',
+                height: '760',
+                onFirstInteractive: function() {
+                    console.log('Tableau dashboard loaded successfully!');
+                },
+                onFirstVizSizeKnown: function() {
+                    console.log('Viz size known');
+                }
+            };
+
+            try {
+                vizInstance = new tableau.Viz(container, vizUrl, options);
+            } catch (error) {
+                console.error('Error loading Tableau viz:', error);
+                container.innerHTML = '<div style="text-align:center;padding:60px 20px;color:rgba(255,255,255,0.5);">' +
+                    '<p style="font-size:18px;margin-bottom:16px;">⚠️ שגיאה בטעינת הדשבורד</p>' +
+                    '<p style="font-size:14px;">נא לנסות לרענן את הדף או לבקר בקישור הבא:</p>' +
+                    '<a href="https://public.tableau.com/views/SnirMichalSales/Dashboard1" target="_blank" ' +
+                    'style="display:inline-block;margin-top:16px;padding:12px 24px;background:var(--gradient-2);' +
+                    'border-radius:10px;color:#fff;text-decoration:none;">פתח את הדשבורד ↗</a></div>';
+            }
+        }
+
+        function resetViz() {
+            var container = document.getElementById('tableauViz');
+            container.innerHTML = '<div class="viz-loading">' +
+                '<div class="loading-content">' +
+                '<div class="loading-bars">' +
+                '<div class="loading-bar"></div>' +
+                '<div class="loading-bar"></div>' +
+                '<div class="loading-bar"></div>' +
+                '<div class="loading-bar"></div>' +
+                '<div class="loading-bar"></div>' +
+                '</div>' +
+                '<p style="color: rgba(255,255,255,0.5); font-size: 14px;">טוען מחדש את הדשבורד...</p>' +
+                '</div></div>';
+
+            if (vizInstance) {
+                vizInstance.dispose();
+                vizInstance = null;
+            }
+
+            setTimeout(function() {
+                initTableau();
+            }, 500);
+        }
+
+        // Initialize when DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', function() {
+                setTimeout(initTableau, 1000);
+            });
+        } else {
+            setTimeout(initTableau, 1000);
+        }
+
+        // ============================================
+        // Smooth scroll for anchor links
+        // ============================================
+        document.querySelectorAll('a[href^="#"]').forEach(function(anchor) {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                var targetId = this.getAttribute('href');
+                var target = document.querySelector(targetId);
+                if (target) {
+                    var offset = 80;
+                    var targetPosition = target.getBoundingClientRect().top + window.pageYOffset - offset;
+                    window.scrollTo({
+                        top: targetPosition,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+
 
