@@ -3,1610 +3,665 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Snir & Michal | לוח בקרה חכם לניתוח מכירות</title>
-    <script src="https://public.tableau.com/javascripts/api/tableau-2.min.js"></script>
+    <title>קובי - תפריט מנצח לאחר קיצור קיבה</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Heebo & Assistant for modern Hebrew typography -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&family=Rubik:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --primary: #1a1a2e;
-            --secondary: #16213e;
-            --accent: #0f3460;
-            --highlight: #e94560;
-            --gold: #f5a623;
-            --light: #f0f0f5;
-            --glass: rgba(255, 255, 255, 0.08);
-            --glass-border: rgba(255, 255, 255, 0.12);
-            --gradient-1: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-            --gradient-2: linear-gradient(135deg, #e94560, #f5a623);
-            --gradient-3: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        html {
-            scroll-behavior: smooth;
-        }
-
-        body {
-            font-family: 'Heebo', 'Rubik', sans-serif;
-            background: var(--primary);
-            color: #ffffff;
-            overflow-x: hidden;
-            line-height: 1.8;
-        }
-
-        /* Animated Background */
-        .bg-animation {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 0;
-            pointer-events: none;
-            overflow: hidden;
-        }
-
-        .bg-animation .particle {
-            position: absolute;
-            border-radius: 50%;
-            opacity: 0.15;
-            animation: floatParticle linear infinite;
-        }
-
-        @keyframes floatParticle {
-            0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
-            10% { opacity: 0.15; }
-            90% { opacity: 0.15; }
-            100% { transform: translateY(-100px) rotate(720deg); opacity: 0; }
-        }
-
-        /* Navbar */
-        .navbar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 1000;
-            padding: 15px 40px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: rgba(26, 26, 46, 0.85);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-bottom: 1px solid var(--glass-border);
-            transition: all 0.4s ease;
-        }
-
-        .navbar.scrolled {
-            padding: 10px 40px;
-            background: rgba(26, 26, 46, 0.95);
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
-        }
-
-        .nav-logo {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            text-decoration: none;
-            color: #fff;
-        }
-
-        .nav-logo-icon {
-            width: 42px;
-            height: 42px;
-            background: var(--gradient-2);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            font-weight: 900;
-            color: #fff;
-            box-shadow: 0 4px 15px rgba(233, 69, 96, 0.4);
-        }
-
-        .nav-logo-text {
-            font-size: 18px;
-            font-weight: 700;
-            letter-spacing: -0.5px;
-        }
-
-        .nav-logo-text span {
-            background: var(--gradient-2);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 8px;
-            list-style: none;
-        }
-
-        .nav-links a {
-            color: rgba(255, 255, 255, 0.75);
-            text-decoration: none;
-            padding: 8px 18px;
-            border-radius: 10px;
-            font-size: 14px;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            position: relative;
-        }
-
-        .nav-links a:hover, .nav-links a.active {
-            color: #fff;
-            background: var(--glass);
-        }
-
-        .nav-links a.active {
-            background: rgba(233, 69, 96, 0.2);
-            color: #e94560;
-        }
-
-        .mobile-toggle {
-            display: none;
-            background: none;
-            border: none;
-            color: #fff;
-            font-size: 24px;
-            cursor: pointer;
-            padding: 8px;
-            border-radius: 8px;
-            transition: background 0.3s;
-        }
-
-        .mobile-toggle:hover {
-            background: var(--glass);
-        }
-
-        /* Hero Section */
-        .hero {
-            position: relative;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 120px 40px 80px;
-            overflow: hidden;
-        }
-
-        .hero-bg-gradient {
-            position: absolute;
-            top: -50%;
-            right: -30%;
-            width: 80%;
-            height: 150%;
-            background: radial-gradient(ellipse, rgba(233, 69, 96, 0.12) 0%, transparent 70%);
-            pointer-events: none;
-        }
-
-        .hero-bg-gradient-2 {
-            position: absolute;
-            bottom: -30%;
-            left: -20%;
-            width: 60%;
-            height: 100%;
-            background: radial-gradient(ellipse, rgba(245, 166, 35, 0.08) 0%, transparent 70%);
-            pointer-events: none;
-        }
-
-        .hero-content {
-            position: relative;
-            z-index: 2;
-            max-width: 900px;
-            text-align: center;
-        }
-
-        .hero-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 20px;
-            background: var(--glass);
-            border: 1px solid var(--glass-border);
-            border-radius: 50px;
-            font-size: 13px;
-            font-weight: 500;
-            color: rgba(255, 255, 255, 0.8);
-            margin-bottom: 30px;
-            backdrop-filter: blur(10px);
-            animation: fadeInDown 0.8s ease forwards;
-        }
-
-        .hero-badge .dot {
-            width: 8px;
-            height: 8px;
-            background: #4ade80;
-            border-radius: 50%;
-            animation: pulse-dot 2s ease infinite;
-        }
-
-        @keyframes pulse-dot {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.5; transform: scale(1.5); }
-        }
-
-        .hero-title {
-            font-size: clamp(36px, 6vw, 72px);
-            font-weight: 900;
-            line-height: 1.15;
-            margin-bottom: 24px;
-            animation: fadeInUp 0.8s ease 0.2s both;
-        }
-
-        .hero-title .gradient-text {
-            background: var(--gradient-2);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .hero-subtitle {
-            font-size: clamp(16px, 2.5vw, 22px);
-            color: rgba(255, 255, 255, 0.65);
-            font-weight: 300;
-            line-height: 1.7;
-            max-width: 700px;
-            margin: 0 auto 40px;
-            animation: fadeInUp 0.8s ease 0.4s both;
-        }
-
-        .hero-buttons {
-            display: flex;
-            gap: 16px;
-            justify-content: center;
-            flex-wrap: wrap;
-            animation: fadeInUp 0.8s ease 0.6s both;
-        }
-
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            padding: 14px 32px;
-            border-radius: 14px;
-            font-size: 15px;
-            font-weight: 600;
-            text-decoration: none;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            border: none;
-            font-family: inherit;
-        }
-
-        .btn-primary {
-            background: var(--gradient-2);
-            color: #fff;
-            box-shadow: 0 8px 30px rgba(233, 69, 96, 0.35);
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 12px 40px rgba(233, 69, 96, 0.5);
-        }
-
-        .btn-secondary {
-            background: var(--glass);
-            color: #fff;
-            border: 1px solid var(--glass-border);
-            backdrop-filter: blur(10px);
-        }
-
-        .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.15);
-            transform: translateY(-3px);
-        }
-
-        .hero-scroll-indicator {
-            position: absolute;
-            bottom: 40px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 8px;
-            color: rgba(255, 255, 255, 0.4);
-            font-size: 12px;
-            animation: bounce 2s ease infinite;
-        }
-
-        .scroll-line {
-            width: 1px;
-            height: 40px;
-            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.4), transparent);
-        }
-
-        @keyframes bounce {
-            0%, 100% { transform: translateX(-50%) translateY(0); }
-            50% { transform: translateX(-50%) translateY(10px); }
-        }
-
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes fadeInDown {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Stats Bar */
-        .stats-bar {
-            position: relative;
-            z-index: 2;
-            padding: 0 40px;
-            margin-top: -40px;
-            margin-bottom: 80px;
-        }
-
-        .stats-container {
-            max-width: 1100px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 20px;
-        }
-
-        .stat-card {
-            background: var(--glass);
-            border: 1px solid var(--glass-border);
-            border-radius: 20px;
-            padding: 28px 24px;
-            text-align: center;
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            transition: all 0.4s ease;
-            opacity: 0;
-            animation: fadeInUp 0.6s ease forwards;
-        }
-
-        .stat-card:nth-child(1) { animation-delay: 0.1s; }
-        .stat-card:nth-child(2) { animation-delay: 0.2s; }
-        .stat-card:nth-child(3) { animation-delay: 0.3s; }
-        .stat-card:nth-child(4) { animation-delay: 0.4s; }
-
-        .stat-card:hover {
-            transform: translateY(-5px);
-            border-color: rgba(233, 69, 96, 0.3);
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-        }
-
-        .stat-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 14px;
-            font-size: 22px;
-        }
-
-        .stat-icon.red { background: rgba(233, 69, 96, 0.15); }
-        .stat-icon.gold { background: rgba(245, 166, 35, 0.15); }
-        .stat-icon.purple { background: rgba(102, 126, 234, 0.15); }
-        .stat-icon.green { background: rgba(74, 222, 128, 0.15); }
-
-        .stat-number {
-            font-size: 28px;
-            font-weight: 800;
-            margin-bottom: 4px;
-            background: var(--gradient-2);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .stat-label {
-            font-size: 13px;
-            color: rgba(255, 255, 255, 0.5);
-            font-weight: 400;
-        }
-
-        /* Sections */
-        .section {
-            position: relative;
-            z-index: 2;
-            padding: 80px 40px;
-        }
-
-        .section-header {
-            text-align: center;
-            margin-bottom: 60px;
-        }
-
-        .section-tag {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 6px 16px;
-            background: rgba(233, 69, 96, 0.1);
-            border: 1px solid rgba(233, 69, 96, 0.2);
-            border-radius: 50px;
-            font-size: 12px;
-            font-weight: 600;
-            color: #e94560;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            margin-bottom: 16px;
-        }
-
-        .section-title {
-            font-size: clamp(28px, 4vw, 44px);
-            font-weight: 800;
-            line-height: 1.2;
-            margin-bottom: 16px;
-        }
-
-        .section-desc {
-            font-size: 16px;
-            color: rgba(255, 255, 255, 0.55);
-            max-width: 600px;
-            margin: 0 auto;
-            line-height: 1.8;
-        }
-
-        /* Tableau Dashboard */
-        .dashboard-section {
-            padding: 0 40px 100px;
-            position: relative;
-            z-index: 2;
-        }
-
-        .dashboard-wrapper {
-            max-width: 1300px;
-            margin: 0 auto;
-            background: var(--glass);
-            border: 1px solid var(--glass-border);
-            border-radius: 24px;
-            overflow: hidden;
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-        }
-
-        .dashboard-toolbar {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 16px 24px;
-            background: rgba(0, 0, 0, 0.2);
-            border-bottom: 1px solid var(--glass-border);
-        }
-
-        .toolbar-dots {
-            display: flex;
-            gap: 8px;
-        }
-
-        .toolbar-dot {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-        }
-
-        .toolbar-dot.red { background: #ff5f57; }
-        .toolbar-dot.yellow { background: #febc2e; }
-        .toolbar-dot.green { background: #28c840; }
-
-        .toolbar-title {
-            font-size: 14px;
-            color: rgba(255, 255, 255, 0.5);
-            font-weight: 500;
-        }
-
-        .toolbar-actions {
-            display: flex;
-            gap: 10px;
-        }
-
-        .toolbar-btn {
-            padding: 6px 14px;
-            background: var(--glass);
-            border: 1px solid var(--glass-border);
-            border-radius: 8px;
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 12px;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-family: inherit;
-        }
-
-        .toolbar-btn:hover {
-            background: rgba(255, 255, 255, 0.12);
-            color: #fff;
-        }
-
-        .dashboard-container {
-            padding: 20px;
-            min-height: 800px;
-        }
-
-        #tableauViz {
-            width: 100%;
-            min-height: 760px;
-        }
-
-        .tableau-placeholder {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 760px;
-            gap: 20px;
-            color: rgba(255, 255, 255, 0.5);
-        }
-
-        .placeholder-spinner {
-            width: 50px;
-            height: 50px;
-            border: 3px solid var(--glass-border);
-            border-top-color: #e94560;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        /* Features */
-        .features-grid {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 24px;
-        }
-
-        .feature-card {
-            background: var(--glass);
-            border: 1px solid var(--glass-border);
-            border-radius: 20px;
-            padding: 36px 28px;
-            transition: all 0.4s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .feature-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: var(--gradient-2);
-            opacity: 0;
-            transition: opacity 0.4s;
-        }
-
-        .feature-card:hover {
-            transform: translateY(-8px);
-            border-color: rgba(233, 69, 96, 0.25);
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
-        }
-
-        .feature-card:hover::before {
-            opacity: 1;
-        }
-
-        .feature-icon {
-            width: 56px;
-            height: 56px;
-            border-radius: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 26px;
-            margin-bottom: 20px;
-        }
-
-        .feature-icon.red { background: rgba(233, 69, 96, 0.12); }
-        .feature-icon.gold { background: rgba(245, 166, 35, 0.12); }
-        .feature-icon.purple { background: rgba(102, 126, 234, 0.12); }
-        .feature-icon.blue { background: rgba(56, 189, 248, 0.12); }
-        .feature-icon.green { background: rgba(74, 222, 128, 0.12); }
-        .feature-icon.pink { background: rgba(236, 72, 153, 0.12); }
-
-        .feature-title {
-            font-size: 18px;
-            font-weight: 700;
-            margin-bottom: 10px;
-        }
-
-        .feature-desc {
-            font-size: 14px;
-            color: rgba(255, 255, 255, 0.5);
-            line-height: 1.7;
-        }
-
-        /* About Section */
-        .about-grid {
-            max-width: 1100px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 60px;
-            align-items: center;
-        }
-
-        .about-image {
-            position: relative;
-        }
-
-        .about-image-card {
-            background: var(--gradient-3);
-            border-radius: 24px;
-            padding: 50px 40px;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .about-image-card::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
-            animation: rotateBg 15s linear infinite;
-        }
-
-        @keyframes rotateBg {
-            to { transform: rotate(360deg); }
-        }
-
-        .about-image-card .big-icon {
-            font-size: 80px;
-            margin-bottom: 20px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .about-image-card h3 {
-            font-size: 24px;
-            font-weight: 700;
-            position: relative;
-            z-index: 1;
-        }
-
-        .about-image-card p {
-            font-size: 15px;
-            opacity: 0.8;
-            position: relative;
-            z-index: 1;
-            margin-top: 8px;
-        }
-
-        .about-text h2 {
-            font-size: 36px;
-            font-weight: 800;
-            margin-bottom: 20px;
-            line-height: 1.3;
-        }
-
-        .about-text h2 .gradient-text {
-            background: var(--gradient-2);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .about-text p {
-            font-size: 15px;
-            color: rgba(255, 255, 255, 0.6);
-            line-height: 1.9;
-            margin-bottom: 16px;
-        }
-
-        .about-list {
-            list-style: none;
-            margin-top: 24px;
-        }
-
-        .about-list li {
-            display: flex;
-            align-items: flex-start;
-            gap: 12px;
-            margin-bottom: 14px;
-            font-size: 14px;
-            color: rgba(255, 255, 255, 0.7);
-        }
-
-        .about-list li .check {
-            flex-shrink: 0;
-            width: 22px;
-            height: 22px;
-            background: rgba(74, 222, 128, 0.15);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #4ade80;
-            font-size: 12px;
-            margin-top: 4px;
-        }
-
-        /* Creators Section */
-        .creators-section {
-            padding: 80px 40px;
-            position: relative;
-            z-index: 2;
-        }
-
-        .creators-grid {
-            max-width: 800px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
-        }
-
-        .creator-card {
-            background: var(--glass);
-            border: 1px solid var(--glass-border);
-            border-radius: 24px;
-            padding: 40px 30px;
-            text-align: center;
-            transition: all 0.4s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .creator-card:hover {
-            transform: translateY(-5px);
-            border-color: rgba(233, 69, 96, 0.3);
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
-        }
-
-        .creator-avatar {
-            width: 90px;
-            height: 90px;
-            border-radius: 50%;
-            margin: 0 auto 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 36px;
-            font-weight: 800;
-            position: relative;
-        }
-
-        .creator-avatar.snir {
-            background: linear-gradient(135deg, #1a1a2e, #0f3460);
-            border: 3px solid rgba(233, 69, 96, 0.3);
-            color: #e94560;
-        }
-
-        .creator-avatar.michal {
-            background: linear-gradient(135deg, #1a1a2e, #0f3460);
-            border: 3px solid rgba(245, 166, 35, 0.3);
-            color: #f5a623;
-        }
-
-        .creator-avatar::after {
-            content: '';
-            position: absolute;
-            inset: -6px;
-            border-radius: 50%;
-            border: 2px dashed rgba(255, 255, 255, 0.1);
-            animation: spin 20s linear infinite;
-        }
-
-        .creator-name {
-            font-size: 20px;
-            font-weight: 700;
-            margin-bottom: 6px;
-        }
-
-        .creator-role {
-            font-size: 13px;
-            color: rgba(255, 255, 255, 0.5);
-            margin-bottom: 16px;
-        }
-
-        .creator-desc {
-            font-size: 13px;
-            color: rgba(255, 255, 255, 0.45);
-            line-height: 1.7;
-        }
-
-        /* CTA Section */
-        .cta-section {
-            padding: 80px 40px;
-            position: relative;
-            z-index: 2;
-        }
-
-        .cta-card {
-            max-width: 900px;
-            margin: 0 auto;
-            background: var(--gradient-3);
-            border-radius: 28px;
-            padding: 60px 50px;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .cta-card::before {
-            content: '';
-            position: absolute;
-            top: -100px;
-            right: -100px;
-            width: 300px;
-            height: 300px;
-            background: rgba(255, 255, 255, 0.08);
-            border-radius: 50%;
-        }
-
-        .cta-card::after {
-            content: '';
-            position: absolute;
-            bottom: -80px;
-            left: -80px;
-            width: 250px;
-            height: 250px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 50%;
-        }
-
-        .cta-card h2 {
-            font-size: clamp(24px, 4vw, 36px);
-            font-weight: 800;
-            margin-bottom: 16px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .cta-card p {
-            font-size: 16px;
-            opacity: 0.85;
-            margin-bottom: 30px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .cta-card .btn {
-            position: relative;
-            z-index: 1;
-        }
-
-        .btn-white {
-            background: #fff;
-            color: #764ba2;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
-        }
-
-        .btn-white:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
-        }
-
-        /* Footer */
-        .footer {
-            position: relative;
-            z-index: 2;
-            padding: 40px;
-            border-top: 1px solid var(--glass-border);
-            text-align: center;
-        }
-
-        .footer-content {
-            max-width: 800px;
-            margin: 0 auto;
-        }
-
-        .footer-logo {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 16px;
-        }
-
-        .footer-logo-icon {
-            width: 36px;
-            height: 36px;
-            background: var(--gradient-2);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 16px;
-            font-weight: 900;
-        }
-
-        .footer-logo-text {
-            font-size: 16px;
-            font-weight: 700;
-        }
-
-        .footer-text {
-            font-size: 13px;
-            color: rgba(255, 255, 255, 0.4);
-            margin-bottom: 8px;
-        }
-
-        .footer-credits {
-            font-size: 12px;
-            color: rgba(255, 255, 255, 0.3);
-        }
-
-        .footer-credits span {
-            background: var(--gradient-2);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            font-weight: 600;
-        }
-
-        /* Animations for scroll */
-        .reveal {
-            opacity: 0;
-            transform: translateY(40px);
-            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        .reveal.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        /* Responsive */
-        @media (max-width: 1024px) {
-            .features-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
-        @media (max-width: 768px) {
-            .navbar {
-                padding: 12px 20px;
-            }
-
-            .nav-links {
-                display: none;
-                position: absolute;
-                top: 100%;
-                left: 0;
-                right: 0;
-                background: rgba(26, 26, 46, 0.98);
-                backdrop-filter: blur(20px);
-                flex-direction: column;
-                padding: 20px;
-                border-bottom: 1px solid var(--glass-border);
-            }
-
-            .nav-links.open {
-                display: flex;
-            }
-
-            .mobile-toggle {
-                display: block;
-            }
-
-            .hero {
-                padding: 100px 20px 60px;
-            }
-
-            .stats-container {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            .stats-bar {
-                padding: 0 20px;
-            }
-
-            .features-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .about-grid {
-                grid-template-columns: 1fr;
-                gap: 40px;
-            }
-
-            .creators-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .dashboard-section {
-                padding: 0 10px 60px;
-            }
-
-            .dashboard-wrapper {
-                border-radius: 16px;
-            }
-
-            .dashboard-container {
-                padding: 10px;
-            }
-
-            #tableauViz {
-                min-height: 600px;
-            }
-
-            .section {
-                padding: 60px 20px;
-            }
-
-            .cta-card {
-                padding: 40px 24px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .stats-container {
-                grid-template-columns: 1fr 1fr;
-                gap: 12px;
-            }
-
-            .stat-card {
-                padding: 20px 16px;
-            }
-
-            .stat-number {
-                font-size: 22px;
-            }
-
-            .hero-buttons {
-                flex-direction: column;
-                align-items: center;
-            }
-
-            .btn {
-                width: 100%;
-                justify-content: center;
-                max-width: 280px;
-            }
-        }
-
-        /* Tableau loading state */
-        .viz-loading {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 600px;
-        }
-
-        .loading-content {
-            text-align: center;
-        }
-
-        .loading-bars {
-            display: flex;
-            gap: 6px;
-            justify-content: center;
-            margin-bottom: 20px;
-        }
-
-        .loading-bar {
-            width: 6px;
-            height: 30px;
-            background: var(--gradient-2);
-            border-radius: 3px;
-            animation: loadingBar 1.2s ease infinite;
-        }
-
-        .loading-bar:nth-child(2) { animation-delay: 0.1s; }
-        .loading-bar:nth-child(3) { animation-delay: 0.2s; }
-        .loading-bar:nth-child(4) { animation-delay: 0.3s; }
-        .loading-bar:nth-child(5) { animation-delay: 0.4s; }
-
-        @keyframes loadingBar {
-            0%, 100% { transform: scaleY(0.5); opacity: 0.5; }
-            50% { transform: scaleY(1.2); opacity: 1; }
-        }
-
-        /* Scroll to top */
-        .scroll-top {
-            position: fixed;
-            bottom: 30px;
-            left: 30px;
-            width: 48px;
-            height: 48px;
-            background: var(--gradient-2);
-            border: none;
-            border-radius: 14px;
-            color: #fff;
-            font-size: 20px;
-            cursor: pointer;
-            z-index: 999;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            transform: translateY(20px);
-            transition: all 0.4s ease;
-            box-shadow: 0 8px 25px rgba(233, 69, 96, 0.35);
-        }
-
-        .scroll-top.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .scroll-top:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 12px 35px rgba(233, 69, 96, 0.5);
-        }
-
-        /* Divider */
-        .section-divider {
-            width: 60px;
-            height: 4px;
-            background: var(--gradient-2);
-            border-radius: 2px;
-            margin: 0 auto 20px;
-        }
-    </style>
-</head>
-<body>
-
-    <!-- Animated Background Particles -->
-    <div class="bg-animation" id="bgAnimation"></div>
-
-    <!-- Navbar -->
-    <nav class="navbar" id="navbar">
-        <a href="#" class="nav-logo">
-            <div class="nav-logo-icon">S</div>
-            <div class="nav-logo-text"><span>Snir</span> & Michal</div>
-        </a>
-        <ul class="nav-links" id="navLinks">
-            <li><a href="#home" class="active">בית</a></li>
-            <li><a href="#dashboard">דשבורד</a></li>
-            <li><a href="#features">יכולות</a></li>
-            <li><a href="#about">אודות</a></li>
-            <li><a href="#creators">צוות</a></li>
-        </ul>
-        <button class="mobile-toggle" id="mobileToggle" aria-label="Toggle menu">☰</button>
-    </nav>
-
-    <!-- Hero Section -->
-    <section class="hero" id="home">
-        <div class="hero-bg-gradient"></div>
-        <div class="hero-bg-gradient-2"></div>
-        <div class="hero-content">
-            <div class="hero-badge">
-                <span class="dot"></span>
-                מערכת אנליטיקה חכמה בזמן אמת
-            </div>
-            <h1 class="hero-title">
-                לוח בקרה חכם<br>
-                ל<span class="gradient-text">ניתוח מכירות</span>
-            </h1>
-            <p class="hero-subtitle">
-                פלטפורמת בינה עסקית מתקדמת המאפשרת ניטור, ניתוח והבנה מעמיקה של נתוני מכירות — הכל במקום אחד, בתצוגה ויזואלית מרהיבה
-            </p>
-            <div class="hero-buttons">
-                <a href="#dashboard" class="btn btn-primary">
-                    📊 צפה בדשבורד
-                </a>
-                <a href="#features" class="btn btn-secondary">
-                    ✨ גלה את היכולות
-                </a>
-            </div>
-        </div>
-        <div class="hero-scroll-indicator">
-            <span>גלול למטה</span>
-            <div class="scroll-line"></div>
-        </div>
-    </section>
-
-    <!-- Stats Bar -->
-    <div class="stats-bar">
-        <div class="stats-container">
-            <div class="stat-card">
-                <div class="stat-icon red">📈</div>
-                <div class="stat-number" id="statRevenue">₪2.4M</div>
-                <div class="stat-label">סך הכנסות</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon gold">👥</div>
-                <div class="stat-number" id="statCustomers">1,250+</div>
-                <div class="stat-label">לקוחות פעילים</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon purple">🌍</div>
-                <div class="stat-number" id="statRegions">18</div>
-                <div class="stat-label">אזורים גיאוגרפיים</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon green">📦</div>
-                <div class="stat-number" id="statProducts">340+</div>
-                <div class="stat-label">מוצרים בקטלוג</div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Dashboard Section -->
-    <section class="dashboard-section" id="dashboard">
-        <div class="section-header reveal">
-            <div class="section-tag">📊 לוח בקרה ראשי</div>
-            <h2 class="section-title">דשבורד אינטראקטיבי</h2>
-            <p class="section-desc">
-                חקור את נתוני המכירות שלנו באמצעות תרשימים דינמיים המעודכנים בזמן אמת. לחץ על כל רכיב לקבלת תובנות מעמיקות
-            </p>
-        </div>
-        <div class="dashboard-wrapper reveal">
-            <div class="dashboard-toolbar">
-                <div class="toolbar-dots">
-                    <div class="toolbar-dot red"></div>
-                    <div class="toolbar-dot yellow"></div>
-                    <div class="toolbar-dot green"></div>
-                </div>
-                <div class="toolbar-title">Snir & Michal Sales Dashboard</div>
-                <div class="toolbar-actions">
-                    <button class="toolbar-btn" onclick="resetViz()">🔄 רענן</button>
-                </div>
-            </div>
-            <div class="dashboard-container">
-                <div id="tableauViz">
-                    <div class="viz-loading">
-                        <div class="loading-content">
-                            <div class="loading-bars">
-                                <div class="loading-bar"></div>
-                                <div class="loading-bar"></div>
-                                <div class="loading-bar"></div>
-                                <div class="loading-bar"></div>
-                                <div class="loading-bar"></div>
-                            </div>
-                            <p style="color: rgba(255,255,255,0.5); font-size: 14px;">טוען את הדשבורד...</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Features Section -->
-    <section class="section" id="features">
-        <div class="section-header reveal">
-            <div class="section-tag">⚡ יכולות המערכת</div>
-            <h2 class="section-title">מה אפשר לעשות כאן?</h2>
-            <p class="section-desc">
-                המערכת מציעה מגוון יכולות מתקדמות לניתוח ויזואלי של נתוני המכירות, המאפשרות קבלת החלטות מבוססת נתונים
-            </p>
-        </div>
-        <div class="features-grid">
-            <div class="feature-card reveal">
-                <div class="feature-icon red">📊</div>
-                <h3 class="feature-title">תרשימים דינמיים</h3>
-                <p class="feature-desc">תרשימי עמודות, קווים ועוגות המציגים מגמות מכירות לאורך זמן, עם אפשרות סינון והתאמה אישית</p>
-            </div>
-            <div class="feature-card reveal">
-                <div class="feature-icon gold">🗺️</div>
-                <h3 class="feature-title">ניתוח גיאוגרפי</h3>
-                <p class="feature-desc">מפות חום אינטראקטיביות המציגות פיזור מכירות לפי אזורים גיאוגרפיים, עם זיהוי אזורים חמים וקרים</p>
-            </div>
-            <div class="feature-card reveal">
-                <div class="feature-icon purple">📈</div>
-                <h3 class="feature-title">מגמות וצמיחה</h3>
-                <p class="feature-desc">מעקב אחר קצב צמיחת מכירות, זיהוי מגמות חיוביות ושליליות, וניתוח עונתיות לאורך השנים</p>
-            </div>
-            <div class="feature-card reveal">
-                <div class="feature-icon blue">🏷️</div>
-                <h3 class="feature-title">ניתוח קטגוריות</h3>
-                <p class="feature-desc">חלוקת מכירות לפי קטגוריות מוצרים, זיהוי המוצרים המובילים והזדמנויות צמיחה חדשות</p>
-            </div>
-            <div class="feature-card reveal">
-                <div class="feature-icon green">💰</div>
-                <h3 class="feature-title">ניתוח רווחיות</h3>
-                <p class="feature-desc">מעקב אחר שולי רווח, השוואה בין קטגוריות וזיהוי אזורי השיפור הפוטנציאליים</p>
-            </div>
-            <div class="feature-card reveal">
-                <div class="feature-icon pink">⚡</div>
-                <h3 class="feature-title">אינטראקטיביות מלאה</h3>
-                <p class="feature-desc">כל התרשימים מחוברים זה לזה — לחיצה על נתון אחד מעדכנת אוטומטית את כל שאר התרשימים</p>
-            </div>
-        </div>
-    </section>
-
-    <!-- About Section -->
-    <section class="section" id="about">
-        <div class="about-grid">
-            <div class="about-image reveal">
-                <div class="about-image-card">
-                    <div class="big-icon">📊</div>
-                    <h3>Power of Data</h3>
-                    <p>הפיכת נתונים לתובנות עסקיות</p>
-                </div>
-            </div>
-            <div class="about-text reveal">
-                <h2>למה <span class="gradient-text">דשבורד</span> הוא הכלי הכי חזק שלך?</h2>
-                <p>
-                    בעולם העסקי של היום, קבלת החלטות מבוססת נתונים היא לא רק יתרון — היא חובה. 
-                    הדשבורד שלנו נבנה במיוחד כדי לספק תמונה מלאה, עדכנית וברורה של כל הפעילות העסקית.
-                </p>
-                <p>
-                    באמצעות Tableau Public, הפלטפורמה המובילה בעולם לבינה עסקית ויזואלית, 
-                    אנחנו מציגים את הנתונים בצורה שהופכת מורכבות לפשטות.
-                </p>
-                <ul class="about-list">
-                    <li>
-                        <span class="check">✓</span>
-                        <span>ניטור בזמן אמת של יעדי מכירות ו-KPIs קריטיים</span>
-                    </li>
-                    <li>
-                        <span class="check">✓</span>
-                        <span>זיהוי מגמות והזדמנויות עסקיות לפני המתחרים</span>
-                    </li>
-                    <li>
-                        <span class="check">✓</span>
-                        <span>חיסכון של שעות בעבודה ידנית עם דוחות אוטומטיים</span>
-                    </li>
-                    <li>
-                        <span class="check">✓</span>
-                        <span>תובנות ויזואליות שמובנות לכל דרג בארגון</span>
-                    </li>
-                    <li>
-                        <span class="check">✓</span>
-                        <span>יכולת סינון מתקדמת לחקירה מעמיקה של כל נתון</span>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </section>
-
-    <!-- Creators Section -->
-    <section class="creators-section" id="creators">
-        <div class="section-header reveal">
-            <div class="section-tag">👥 נוצר על ידי</div>
-            <h2 class="section-title">הצוות שמאחורי הפרויקט</h2>
-            <p class="section-desc">
-                שותפות מקצועית שמשלבת ידע, ניסיון וחדשנות ליצירת כלי אנליטי פורץ דרך
-            </p>
-        </div>
-        <div class="creators-grid">
-            <div class="creator-card reveal">
-                <div class="creator-avatar snir">ש</div>
-                <h3 class="creator-name">מר שניר</h3>
-                <p class="creator-role">מייסד שותף | מוביל אנליטיקה</p>
-                <p class="creator-desc">
-                    מומחה בניתוח נתונים ובינה עסקית. אחראי על ארכיטקטורת המידע, פיתוח תרשימים מתקדמים והפקת תובנות אסטרטגיות מהנתונים
-                </p>
-            </div>
-            <div class="creator-card reveal">
-                <div class="creator-avatar michal">מ</div>
-                <h3 class="creator-name">גברת מיכל</h3>
-                <p class="creator-role">מייסדת שותפת | מובילת מוצר</p>
-                <p class="creator-desc">
-                    מומחית בחוויית משתמש ועיצוב ויזואלי. אחראית על תכנון הממשק, עיצוב התצוגות והבטחת חוויית משתמש אינטואיטיבית ומרשימה
-                </p>
-            </div>
-        </div>
-    </section>
-
-    <!-- CTA Section -->
-    <section class="cta-section">
-        <div class="cta-card reveal">
-            <h2>מוכנים לגלות את הכוח של הנתונים שלכם?</h2>
-            <p>התחילו לחקור את הדשבורד עכשיו וגלו תובנות שישנו את הדרך שבה אתם מבינים את העסק שלכם</p>
-            <a href="#dashboard" class="btn btn-white">
-                🚀 לדשבורד המלא
-            </a>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="footer-content">
-            <div class="footer-logo">
-                <div class="footer-logo-icon">S</div>
-                <div class="footer-logo-text">Snir & Michal</div>
-            </div>
-            <p class="footer-text">
-                לוח בקרה חכם לניתוח מכירות — פלטפורמת בינה עסקית מתקדמת
-            </p>
-            <p class="footer-credits">
-                פותח ונבנה על ידי <span>מר שניר</span> ו<span>גברת מיכל</span> | כל הזכויות שמורות © 2024
-            </p>
-        </div>
-    </footer>
-
-    <!-- Scroll to Top -->
-    <button class="scroll-top" id="scrollTop" aria-label="Scroll to top">↑</button>
-
+    <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;600;700;800&family=Heebo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <!-- Lucide Icons via CDN for beautiful glyphs -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
     <script>
-        // ============================================
-        // Background Particles
-        // ============================================
-        (function createParticles() {
-            const bg = document.getElementById('bgAnimation');
-            const colors = ['#e94560', '#f5a623', '#667eea', '#764ba2', '#4ade80'];
-            for (let i = 0; i < 30; i++) {
-                const particle = document.createElement('div');
-                particle.classList.add('particle');
-                const size = Math.random() * 8 + 3;
-                particle.style.width = size + 'px';
-                particle.style.height = size + 'px';
-                particle.style.left = Math.random() * 100 + '%';
-                particle.style.background = colors[Math.floor(Math.random() * colors.length)];
-                particle.style.animationDuration = (Math.random() * 20 + 15) + 's';
-                particle.style.animationDelay = (Math.random() * 10) + 's';
-                bg.appendChild(particle);
-            }
-        })();
-
-        // ============================================
-        // Navbar Scroll Effect
-        // ============================================
-        const navbar = document.getElementById('navbar');
-        const scrollTop = document.getElementById('scrollTop');
-
-        window.addEventListener('scroll', function() {
-            if (window.scrollY > 50) {
-                navbar.classList.add('scrolled');
-            } else {
-                navbar.classList.remove('scrolled');
-            }
-
-            if (window.scrollY > 500) {
-                scrollTop.classList.add('visible');
-            } else {
-                scrollTop.classList.remove('visible');
-            }
-
-            // Active nav link
-            const sections = ['home', 'dashboard', 'features', 'about', 'creators'];
-            for (let i = sections.length - 1; i >= 0; i--) {
-                const section = document.getElementById(sections[i]);
-                if (section) {
-                    const rect = section.getBoundingClientRect();
-                    if (rect.top <= 200) {
-                        document.querySelectorAll('.nav-links a').forEach(function(link) {
-                            link.classList.remove('active');
-                        });
-                        const activeLink = document.querySelector('.nav-links a[href="#' + sections[i] + '"]');
-                        if (activeLink) activeLink.classList.add('active');
-                        break;
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Assistant', 'Heebo', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f4f7f5',
+                            100: '#e5ebe6',
+                            500: '#4a6b53', // Sage Green primary
+                            600: '#3e5945',
+                            700: '#2f4334',
+                            deep: '#1e2d22',
+                        },
+                        kosher: {
+                            dairy: '#3b82f6', // Blue
+                            meat: '#ef4444',  // Red
+                            parve: '#10b981'  // Green
+                        }
                     }
                 }
             }
-        });
+        }
+    </script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #f3f6f4 0%, #e9efe9 100%);
+            min-height: 100vh;
+        }
+        /* Custom scrollbar for beautiful menus */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="font-sans antialiased text-stone-800 pb-16">
 
-        scrollTop.addEventListener('click', function() {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        });
+    <!-- Top Decorative bar -->
+    <div class="w-full h-2 bg-gradient-to-r from-emerald-600 via-amber-500 to-emerald-800"></div>
 
-        // ============================================
-        // Mobile Toggle
-        // ============================================
-        const mobileToggle = document.getElementById('mobileToggle');
-        const navLinks = document.getElementById('navLinks');
+    <div class="max-w-4xl mx-auto px-4 sm:px-6">
+        
+        <!-- Header Section -->
+        <header class="text-center my-8 md:my-12">
+            <div class="inline-flex items-center justify-center p-3 bg-brand-500/10 rounded-full mb-4">
+                <i data-lucide="utensils-cross" class="w-8 h-8 text-brand-500"></i>
+            </div>
+            <h1 class="text-3xl md:text-4xl font-extrabold text-brand-deep tracking-tight">התפריט הבריא של קובי</h1>
+            <p class="text-stone-500 mt-2 text-md md:text-lg font-medium max-w-md mx-auto">
+                מחולל תפריטים מועשרי חלבון (95g+), מותאמים אישית לבני 24 שמתאמנים
+            </p>
+        </header>
 
-        mobileToggle.addEventListener('click', function() {
-            navLinks.classList.toggle('open');
-            mobileToggle.textContent = navLinks.classList.contains('open') ? '✕' : '☰';
-        });
+        <!-- Dynamic Wake-up Time Configuration Card -->
+        <div class="bg-white rounded-3xl p-6 shadow-md border border-stone-100 mb-6 transition-all duration-300">
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div class="flex items-center gap-3">
+                    <div class="p-2.5 bg-amber-500/10 text-amber-600 rounded-2xl">
+                        <i data-lucide="alarm-clock" class="w-6 h-6 animate-pulse"></i>
+                    </div>
+                    <div class="text-right">
+                        <h3 class="font-extrabold text-stone-800 text-base">מתי התעוררת היום?</h3>
+                        <p class="text-xs text-stone-500">שעות הארוחות יתעדכנו אוטומטית לפי שעת היקיצה שלך</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <input type="time" id="wakeUpTimeInput" value="08:00" onchange="updateWakeUpTime(this.value)" class="bg-stone-50 border border-stone-200 text-stone-800 rounded-xl p-2.5 font-bold text-base outline-none focus:ring-2 focus:ring-brand-500 transition cursor-pointer">
+                    <button onclick="setToNowTime()" class="px-3 py-2.5 bg-stone-100 hover:bg-stone-200 text-stone-700 font-bold rounded-xl text-xs transition active:scale-95 flex items-center gap-1">
+                        <i data-lucide="clock" class="w-4 h-4"></i>
+                        <span>עכשיו</span>
+                    </button>
+                </div>
+            </div>
+        </div>
 
-        // Close mobile menu on link click
-        navLinks.querySelectorAll('a').forEach(function(link) {
-            link.addEventListener('click', function() {
-                navLinks.classList.remove('open');
-                mobileToggle.textContent = '☰';
-            });
-        });
+        <!-- Quick Info Banner -->
+        <div class="bg-white/80 backdrop-blur-sm border border-brand-100 rounded-2xl p-4 mb-8 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <div class="p-2 bg-amber-500/10 text-amber-600 rounded-xl">
+                    <i data-lucide="shield-check" class="w-5 h-5"></i>
+                </div>
+                <div class="text-right">
+                    <h4 class="font-bold text-stone-800 text-sm">הפרדת בשר וחלב מובנית</h4>
+                    <p class="text-xs text-stone-500">תפריטים כשרים המותאמים בדיוק לאימונים שלך</p>
+                </div>
+            </div>
+            
+            <div class="h-px w-full sm:h-8 sm:w-px bg-stone-200"></div>
 
-        // ============================================
-        // Scroll Reveal
-        // ============================================
-        const revealElements = document.querySelectorAll('.reveal');
+            <!-- Bariatric Hydration Helper -->
+            <div id="waterTimerWidget" class="flex items-center justify-between gap-4 w-full sm:w-auto">
+                <div class="flex items-center gap-2">
+                    <div class="p-2 bg-blue-500/10 text-blue-600 rounded-xl">
+                        <i data-lucide="droplet" class="w-5 h-5"></i>
+                    </div>
+                    <div class="text-right">
+                        <h4 class="font-bold text-stone-800 text-sm">הפרדת נוזלים מאוכל</h4>
+                        <p id="timerDisplay" class="text-xs text-stone-500">הפעל טיימר של 30 דקות בסיום הביס</p>
+                    </div>
+                </div>
+                <button id="startTimerBtn" onclick="toggleWaterTimer()" class="px-4 py-1.5 bg-blue-600 text-white font-bold rounded-lg text-xs hover:bg-blue-700 transition active:scale-95 flex items-center gap-1">
+                    <i data-lucide="timer" class="w-3.5 h-3.5"></i>
+                    <span>הפעל</span>
+                </button>
+            </div>
+        </div>
 
-        const revealObserver = new IntersectionObserver(function(entries) {
-            entries.forEach(function(entry) {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('visible');
-                }
-            });
-        }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+        <!-- Action / Interactive Control Hub -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            
+            <!-- Quick Menu Selector Card -->
+            <div class="bg-white rounded-3xl p-6 shadow-md border border-stone-100 flex flex-col justify-between h-full">
+                <div>
+                    <h3 class="text-lg font-bold text-brand-deep flex items-center gap-2 mb-2">
+                        <i data-lucide="bookmark-check" class="w-5 h-5 text-brand-500"></i>
+                        בחירה מהירה
+                    </h3>
+                    <p class="text-stone-500 text-sm mb-4">מעדיף לא להגריל? בחר ישירות את אחד מעשרת התפריטים המועשרים:</p>
+                </div>
+                <select id="directMenuSelect" onchange="loadSelectedMenu(this.value)" class="w-full bg-stone-50 border border-stone-200 text-stone-800 rounded-xl p-3 font-semibold text-sm outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition cursor-pointer">
+                    <option value="" disabled selected>-- בחר תפריט --</option>
+                    <!-- Options loaded dynamically -->
+                </select>
+            </div>
 
-        revealElements.forEach(function(el) {
-            revealObserver.observe(el);
-        });
+            <!-- Big Interactive Roll Button Card -->
+            <div class="bg-gradient-to-br from-brand-500 to-brand-700 rounded-3xl p-6 shadow-xl flex flex-col items-center justify-center text-center text-white md:col-span-2 group relative overflow-hidden">
+                <div class="absolute -right-10 -bottom-10 opacity-10 pointer-events-none transition-transform duration-700 group-hover:scale-125">
+                    <i data-lucide="dices" class="w-48 h-48"></i>
+                </div>
+                <i data-lucide="sparkles" class="w-8 h-8 text-amber-300 mb-2 animate-bounce"></i>
+                <h2 class="text-xl font-extrabold mb-1">לא יודע מה בא לך לאכול היום?</h2>
+                <p class="text-brand-100/90 text-sm max-w-sm mb-5">ניתן למערכת לבחור בשבילך תפריט יומי עשיר במיוחד בחלבון וקל לעיכול!</p>
+                <button onclick="rollMenu()" class="px-8 py-3.5 bg-amber-400 text-brand-deep font-black rounded-full shadow-lg hover:bg-amber-300 transition duration-300 transform hover:scale-105 active:scale-95 flex items-center gap-2 text-md">
+                    <i data-lucide="dices" class="w-5 h-5"></i>
+                    <span>הגרל לי תפריט יומי</span>
+                </button>
+            </div>
+        </div>
 
-        // ============================================
-        // Tableau Embed
-        // ============================================
-        var vizContainer = null;
-        var vizInstance = null;
+        <!-- Output Main Screen Card -->
+        <div id="outputContainer" class="hidden">
+            <div id="menuCard" class="bg-white rounded-3xl shadow-xl border border-stone-100 overflow-hidden transform transition-all duration-300">
+                
+                <!-- Card Header -->
+                <div class="bg-gradient-to-r from-stone-900 to-brand-deep p-6 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div class="flex items-center gap-3">
+                        <div class="p-3 bg-brand-500/20 rounded-2xl">
+                            <i data-lucide="heart-pulse" class="w-6 h-6 text-amber-400"></i>
+                        </div>
+                        <div>
+                            <span class="text-xs font-bold text-amber-400 uppercase tracking-widest">נבחר עבורך</span>
+                            <h2 id="menuName" class="text-xl font-extrabold mt-0.5">שם התפריט שיופיע</h2>
+                        </div>
+                    </div>
+                    <div class="inline-flex items-center gap-1.5 px-3 py-1 bg-white/10 rounded-full text-xs font-bold border border-white/20">
+                        <i data-lucide="award" class="w-3.5 h-3.5 text-amber-300"></i>
+                        <span>חלבון מוגבר למתאמנים</span>
+                    </div>
+                </div>
 
-        function initTableau() {
-            var container = document.getElementById('tableauViz');
-            var vizUrl = 'https://public.tableau.com/views/SnirMichalSales/Dashboard1';
-            var options = {
-                hideTabs: false,
-                hideToolbar: false,
-                width: '100%',
-                height: '760',
-                onFirstInteractive: function() {
-                    console.log('Tableau dashboard loaded successfully!');
-                },
-                onFirstVizSizeKnown: function() {
-                    console.log('Viz size known');
-                }
-            };
+                <!-- Macro Nutrients Dash -->
+                <div class="bg-stone-50 border-b border-stone-100 p-6">
+                    <h4 class="text-stone-400 text-xs font-bold uppercase tracking-wider mb-4 text-center">ערכים תזונתיים משוערכים ליום שלם</h4>
+                    <div class="grid grid-cols-4 gap-4 mb-6">
+                        
+                        <!-- Calories -->
+                        <div class="bg-white p-3 rounded-2xl shadow-sm border border-stone-100 text-center">
+                            <span id="cal" class="block text-xl sm:text-2xl font-extrabold text-stone-800 font-sans">0</span>
+                            <span class="text-[10px] sm:text-xs font-bold text-stone-400 block mt-1">קלוריות</span>
+                            <div class="w-full bg-stone-100 h-1.5 rounded-full mt-2 overflow-hidden">
+                                <div id="calBar" class="bg-amber-400 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+                            </div>
+                        </div>
 
-            try {
-                vizInstance = new tableau.Viz(container, vizUrl, options);
-            } catch (error) {
-                console.error('Error loading Tableau viz:', error);
-                container.innerHTML = '<div style="text-align:center;padding:60px 20px;color:rgba(255,255,255,0.5);">' +
-                    '<p style="font-size:18px;margin-bottom:16px;">⚠️ שגיאה בטעינת הדשבורד</p>' +
-                    '<p style="font-size:14px;">נא לנסות לרענן את הדף או לבקר בקישור הבא:</p>' +
-                    '<a href="https://public.tableau.com/views/SnirMichalSales/Dashboard1" target="_blank" ' +
-                    'style="display:inline-block;margin-top:16px;padding:12px 24px;background:var(--gradient-2);' +
-                    'border-radius:10px;color:#fff;text-decoration:none;">פתח את הדשבורד ↗</a></div>';
+                        <!-- Protein Target -->
+                        <div class="bg-white p-3 rounded-2xl shadow-sm border border-stone-100 text-center">
+                            <span id="pro" class="block text-xl sm:text-2xl font-extrabold text-emerald-600 font-sans">0</span>
+                            <span class="text-[10px] sm:text-xs font-bold text-stone-400 block mt-1">חלבון יעד</span>
+                            <div class="w-full bg-stone-100 h-1.5 rounded-full mt-2 overflow-hidden">
+                                <div id="proBar" class="bg-emerald-500 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+                            </div>
+                        </div>
+
+                        <!-- Carbs -->
+                        <div class="bg-white p-3 rounded-2xl shadow-sm border border-stone-100 text-center">
+                            <span id="carb" class="block text-xl sm:text-2xl font-extrabold text-blue-600 font-sans">0</span>
+                            <span class="text-[10px] sm:text-xs font-bold text-stone-400 block mt-1">פחמימות</span>
+                            <div class="w-full bg-stone-100 h-1.5 rounded-full mt-2 overflow-hidden">
+                                <div id="carbBar" class="bg-blue-500 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+                            </div>
+                        </div>
+
+                        <!-- Fat -->
+                        <div class="bg-white p-3 rounded-2xl shadow-sm border border-stone-100 text-center">
+                            <span id="fat" class="block text-xl sm:text-2xl font-extrabold text-purple-600 font-sans">0</span>
+                            <span class="text-[10px] sm:text-xs font-bold text-stone-400 block mt-1">שומן</span>
+                            <div class="w-full bg-stone-100 h-1.5 rounded-full mt-2 overflow-hidden">
+                                <div id="fatBar" class="bg-purple-500 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Interactive Protein Tracker Box -->
+                    <div class="bg-emerald-50 border border-emerald-100 rounded-2xl p-4">
+                        <div class="flex items-center justify-between mb-2">
+                            <div class="flex items-center gap-2">
+                                <i data-lucide="check-square" class="w-5 h-5 text-emerald-600"></i>
+                                <span class="font-bold text-stone-800 text-sm">מד חלבון יומי דינמי:</span>
+                            </div>
+                            <span class="text-xs font-extrabold text-emerald-800" id="trackerStats">נצרך: 0 גרם מתוך 0 גרם</span>
+                        </div>
+                        <div class="w-full bg-emerald-200/50 h-3 rounded-full overflow-hidden">
+                            <div id="trackerProgressBar" class="bg-emerald-600 h-full rounded-full transition-all duration-300" style="width: 0%"></div>
+                        </div>
+                        <p class="text-[10px] text-emerald-700/80 mt-1.5 font-medium">סמן וי (V) ליד הארוחות שאכלת למטה כדי לראות את כמות החלבון מתעדכנת!</p>
+                    </div>
+                </div>
+
+                <!-- Meals Schedule -->
+                <div class="p-6">
+                    <h3 class="text-stone-500 text-xs font-bold uppercase tracking-wider mb-6 flex items-center gap-1.5">
+                        <i data-lucide="clock" class="w-4 h-4 text-stone-400"></i>
+                        סדר ארוחות יומי וטיפים להכנה טעימה ורכה
+                    </h3>
+
+                    <div id="mealsContainer" class="space-y-6 relative border-r-2 border-dashed border-stone-200 pr-5 mr-3">
+                        <!-- Meals generated by JS dynamically -->
+                    </div>
+                </div>
+
+                <!-- Rules / Tips Banner inside card -->
+                <div class="bg-brand-50/50 p-6 border-t border-stone-100 flex flex-col md:flex-row items-start gap-4">
+                    <div class="p-2.5 bg-amber-400/20 text-amber-700 rounded-2xl">
+                        <i data-lucide="lightbulb" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-stone-800 text-sm">חוקי הזהב לתזונת ספורט בריאטרית:</h4>
+                        <ul class="text-xs text-stone-500 mt-1.5 space-y-1.5 list-disc list-inside">
+                            <li><strong>חשיבות הלעיסה:</strong> תלעס כל ביס 25-30 פעמים עד שהמרקם פירה לגמרי.</li>
+                            <li><strong>משך הארוחה:</strong> שבו לאכול בנחת. ארוחה צריכה לקחת בערך 20-30 דקות.</li>
+                            <li><strong>לעולם אל תשתה מים יחד עם האוכל.</strong> זה דוחף את האוכל החוצה מהר מדי ומותח את הקיבה.</li>
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Array of menus featuring creative, high protein, completely kosher recipes.
+        // Processed meats (such as pastrami, sausages, etc.) are NOT used.
+        // Dynamic times are calculated via relative offsets in hours since wake-up time.
+        const menus = [
+            {
+                name: "תפריט א' - הקלאסי והעשיר",
+                macros: { cal: 1172, pro: 119, carb: 70, fat: 42 },
+                meals: [
+                    { offsetHours: 0.5, kosherType: "dairy", kosherLabel: "חלבי", name: "ארוחת בוקר", protein: 20, desc: "חביתה מ-2 ביצים גדולות + 2 יחידות לחמית עם 3 כפות קוטג' 5% + מלפפון קלוף.", tip: "בשביל חביתה רכה ולא יבשה, תוסיף כף מים לביצים לפני הטריפה ותכסה את המחבת בזמן הטיגון." },
+                    { offsetHours: 3.0, kosherType: "dairy", kosherLabel: "חלבי", name: "ארוחת ביניים בוקר", protein: 21, desc: "גביע יוגורט חלבון (GO/PRO) + 5 שקדים בצד.", tip: "אם קשה לך לאכול שקדים יבשים, השהה אותם בכוס מים חמים לכמה דקות וקלף את הקליפה. הם יהיו רכים וקלים לעיכול." },
+                    { offsetHours: 6.0, kosherType: "meat", kosherLabel: "בשרי", name: "ארוחת צהריים", protein: 41, desc: "חזה עוף פרוס דק (130 גרם) עשוי במחבת נון-סטיק + רבע כרוב אפוי בתנור.", tip: "כדי שחזה העוף יישאר עסיסי בטירוף במחבת, טגן אותו עם מכסה סגור על אש בינונית רק 3 דקות לכל צד." },
+                    { offsetHours: 8.5, kosherType: "parve", kosherLabel: "פרווה", name: "ארוחת ביניים אחה\"צ", protein: 24, desc: "קופסת טונה קטנה מסוננת + פרוסת לחם מלא קלויה בטוסטר + חצי אבוקדו בינוני.", tip: "תמעך את הטונה יחד עם האבוקדו, מעט מיץ לימון ומלח. המרקם הקרמי הופך את הטונה לקלה במיוחד לבליעה." },
+                    { offsetHours: 11.0, kosherType: "parve", kosherLabel: "פרווה", name: "ארוחת ערב", protein: 13, desc: "שקשוקה קלה מביצה אחת שלמה + חלבון ביצה נוסף (מבושלים היטב ברוטב עגבניות) + 2 יחידות לחמית.", tip: "בישול השקשוקה עם מכסה סגור יבטיח שהחלמון יתקשה לגמרי, דבר שמקל על העיכול של מנותחים." }
+                ]
+            },
+            {
+                name: "תפריט ב' - שגרת דג עסיסית ומחוזקת",
+                macros: { cal: 1232, pro: 111, carb: 80, fat: 51 },
+                meals: [
+                    { offsetHours: 0.5, kosherType: "dairy", kosherLabel: "חלבי", name: "ארוחת בוקר", protein: 21, desc: "גביע יוגורט חלבון 3% עם כף שטוחה גרנולה וחצי כפית דבש.", tip: "תן לגרנולה לשבת בתוך היוגורט לפחות 3 דקות לפני האכילה כדי שתרכך לחלוטין ולא תציק בקיבה." },
+                    { offsetHours: 3.0, kosherType: "dairy", kosherLabel: "חלבי", name: "ארוחת ביניים בוקר", protein: 23, desc: "חביתה מ-2 ביצים + פרוסת לחם קלויה עם 2 כפות קוטג' 5% ומעט בולגרית מפוררת.", tip: "קצץ מעט שמיר או פטרוזיליה לתוך הביצים לקבלת טעם רענן ומקצועי של בית קפה." },
+                    { offsetHours: 6.0, kosherType: "parve", kosherLabel: "פרווה", name: "ארוחת צהריים", protein: 31, desc: "130 גרם פילה סלמון או אמנון אפוי בתנור + 3 כפות פירה תפוחי אדמה רך.", tip: "אפה את הדג כשהוא מכוסה בנייר כסף ב-180 מעלות למשך 12 דקות בלבד. הדג יישאר לח, נימוח ומתפרק בקלות." },
+                    { offsetHours: 8.5, kosherType: "parve", kosherLabel: "פרווה", name: "ארוחת ביניים אחה\"צ", protein: 24, desc: "קופסת טונה קטנה מסוננת + חצי אבוקדו מועך עם לימון ומלח + פרוסת לחם מלא קלויה.", tip: "קפוץ את פרוסת הלחם בטוסטר עד שהיא פריכה - לחם קלוי ופריך (צנים) מתעכל בקיבה מקוצרת הרבה יותר טוב מלחם רך שנוטה להידבק." },
+                    { offsetHours: 11.0, kosherType: "parve", kosherLabel: "פרווה", name: "ארוחת ערב", protein: 12, desc: "סלט ביצים מביצה קשה וחלמון נוסף מעוכים עם כפית מיונז לייט + 2 לחמיות דקות.", tip: "ערבב כפית חרדל חריף עם המיונז כדי לתת עומק לטעם בלי להכביד." }
+                ]
+            },
+            {
+                name: "תפריט ג' - קציצות בשר רכות ברוטב",
+                macros: { cal: 1027, pro: 95, carb: 80, fat: 35 },
+                meals: [
+                    { offsetHours: 0.5, kosherType: "dairy", kosherLabel: "חלבי", name: "ארוחת בוקר", protein: 21, desc: "גביע מעדן חלבון (GO/PRO) וניל או שוקולד + 5 חצאי אגוזי מלך בצד.", tip: "מעדני החלבון נהדרים לסגירת הפינה המתוקה של הבוקר בלי להקפיץ את הסוכר." },
+                    { offsetHours: 3.0, kosherType: "dairy", kosherLabel: "חלבי", name: "ארוחת ביניים בוקר", protein: 13, desc: "פרוסת לחם מלא קלויה (טוסט) עם פרוסת גבינה צהובה 9% מומסת + מלפפון קלוף.", tip: "הסרת קליפת המלפפון חיונית למניעת גזים ותחושת נפיחות אצל מנותחים." },
+                    { offsetHours: 6.0, kosherType: "meat", kosherLabel: "בשרי", name: "ארוחת צהריים", protein: 26, desc: "3 קציצות בקר או עוף רכות שבושלו ברוטב עגבניות פשוט + 3 כפות פתיתים שספגו מהרוטב.", tip: "כדי שהקציצות יהיו רכות במיוחד, תגרד פנימה בצל שלם סחוט - המיצים של הבצל שומרים על מרקם קטיפתי ורך." },
+                    { offsetHours: 8.5, kosherType: "parve", kosherLabel: "פרווה", name: "ארוחת ביניים אחה\"צ", protein: 14, desc: "שקשוקה קלה מביצה אחת שלמה + חלבון ביצה נוסף (מבושלים היטב ברוטב עגבניות) + 2 יחידות לחמית.", tip: "בישול השקשוקה עם מכסה סגור יבטיח שהחלמון יתקשה לגמרי, דבר שמקל על העיכול של מנותחים." },
+                    { offsetHours: 11.0, kosherType: "parve", kosherLabel: "פרווה", name: "ארוחת ערב", protein: 21, desc: "קופסת טונה קטנה במים מסוננת ומעורבבת עם כף שמן זית, מלח, פלפל ולימון סחוט.", tip: "הלימון שובר את הטעם החזק של הטונה ומשאיר אותה לחה ועסיסית." }
+                ]
+            },
+            {
+                name: "תפריט ד' - שווארמת עוף ביתית במחבת",
+                macros: { cal: 1070, pro: 101, carb: 69, fat: 39 },
+                meals: [
+                    { offsetHours: 0.5, kosherType: "dairy", kosherLabel: "חלבי", name: "ארוחת בוקר", protein: 11, desc: "גביע ייוגורט לבן 3% טבעי מערבב עם כף חמאת בוטנים טבעית וטיפונת דבש.", tip: "השילוב של יוגורט וחמאת בוטנים נותן מרקם קרמי ורך בטירוף, שמקל על הבליעה בשעות הבוקר המוקדמות." },
+                    { offsetHours: 3.0, kosherType: "dairy", kosherLabel: "חלבי", name: "ארוחת ביניים בוקר", protein: 13, desc: "טוסט גבינה צהובה 9% מפרוסת לחם מלא אחת + 2 כפות קוטג' 5% בצד לטבילה.", tip: "הטבילה בקוטג' הלח מונעת מהטוסטר היבש 'להיתקע' ומסייעת למעבר נוח וחלק." },
+                    { offsetHours: 6.0, kosherType: "meat", kosherLabel: "בשרי", name: "ארוחת צהריים", protein: 41, desc: "130 גרם רצועות דקות של שווארמת חזה עוף/פרגית במחבת + 3 כפות פירה תפוחי אדמה ובטטה חלק.", tip: "תקפיץ את השווארמה על אש גבוהה במשך 4 דקות בלבד עם תבלין שווארמה, קצת כורכום ומלח כדי שלא תתייבש." },
+                    { offsetHours: 8.5, kosherType: "parve", kosherLabel: "פרווה", name: "ארוחת ביניים אחה\"צ", protein: 15, desc: "סלט ביצים קליל: 2 ביצים קשות חתוכות עם כפית מיונז לייט, מלח ופלפל + 2 יחידות לחמית.", tip: "מעוך את החלבון והחלמון היטב עם המזלג כדי ליצור מרקם אחיד שעובר בקלות בוושט." },
+                    { offsetHours: 11.0, kosherType: "parve", kosherLabel: "פרווה", name: "ארוחת ערב", protein: 21, desc: "קופסת טונה קטנה מסוננת מעורבבת עם חצי כפית מיונז לייט + 2 יחידות לחמית + מלפפון קלוף.", tip: "לחמית קלה לפירוק ואינה כבדה כמו לחם רגיל בערב." }
+                ]
+            },
+            {
+                name: "תפריט ה' - מוקפץ עוף קל ומהיר",
+                macros: { cal: 980, pro: 111, carb: 58, fat: 30 },
+                meals: [
+                    { offsetHours: 0.5, kosherType: "dairy", kosherLabel: "חלבי", name: "ארוחת בוקר", protein: 17, desc: "חביתה או מקושקשת מ-2 ביצים + 2 כפות קוטג' 5% + רבע אבוקדו בינוני.", tip: "טיגון חביתה עם תרסיס שמן זית מונע שומן עודף וכבד בבטן על הבוקר." },
+                    { offsetHours: 3.0, kosherType: "dairy", kosherLabel: "חלבי", name: "ארוחת ביניים בוקר", protein: 21, desc: "גביע יוגורט חלבון טבעי או וניל + 5 שקדים.", tip: "יוגורט חלבון בטעם טבעי הולך מעולה עם כמה טיפות ממתיק טבעי (כמו סטיביה) ללא קלוריות." },
+                    { offsetHours: 6.0, kosherType: "meat", kosherLabel: "בשרי", name: "ארוחת צהריים", protein: 41, desc: "130 גרם חזה עוף חתוך לקוביות קטנות ומוקפץ עם מעט סויה ואבקת שום + 3 כפות אורז בסמטי רך.", tip: "בזמן בישול האורז, הוסף עוד רבע כוס מים מהרגיל כדי שיצא רך ומאוד נוח לעיכול עבור הקיבה." },
+                    { offsetHours: 8.5, kosherType: "parve", kosherLabel: "פרווה", name: "ארוחת ביניים אחה\"צ", protein: 21, desc: "קופסת טונה קטנה מסוננת מעורבבת עם חצי כפית מיונז לייט + 2 יחידות לחמית + מלפפון קלוף.", tip: "לחמית קלה לפירוק ואינה כבדה כמו לחם רגיל בערב." },
+                    { offsetHours: 11.0, kosherType: "parve", kosherLabel: "פרווה", name: "ארוחת ערב", protein: 11, desc: "חביתת חלבונים מ-2 חלבונים (בלי החלמון) עם כף פטרוזיליה קצוצה ופרוסת לחם קלוי אחת.", tip: "החלבון של הביצה קל מאוד לעיכול בערב ומצוין לאחר יום עמוס." }
+                ]
+            },
+            {
+                name: "תפריט ו' - עוף מפורק ופירה נימוח",
+                macros: { cal: 905, pro: 98, carb: 83, fat: 37 },
+                meals: [
+                    { offsetHours: 0.5, kosherType: "dairy", kosherLabel: "חלבי", name: "ארוחת בוקר", protein: 8, desc: "גביע יוגורט 3% טבעי + כף שטוחה גרנולה וחצי כפית דבש (להשהות לריכוך).", tip: "עדיף לבחור ביוגורט יווני שהוא סמיך יותר ובעל אחוז חלבון גבוה יותר מטבעו." },
+                    { offsetHours: 3.0, kosherType: "dairy", kosherLabel: "חלבי", name: "ארוחת ביניים בוקר", protein: 18, desc: "חביתה מ-2 ביצים + 2 יחידות לחמית עם קוטג' 5%.", tip: "תיבול החביתה בקורט אורגנו יבש מעניק לה טעם עשיר של פיצה בלי הקלוריות." },
+                    { offsetHours: 6.0, kosherType: "meat", kosherLabel: "בשרי", name: "ארוחת צהריים", protein: 41, desc: "130 גרם חזה עוף מפורק למזלג (חוטים) עסיסי במחבת + 3 כפות פירה דלורית או בטטה.", tip: "לאחר בישול חזה העוף, פרק אותו לשערות בעזרת שני מזלגות - המרקם הזה פשוט 'מחליק' בבטן בקלות מדהימה." },
+                    { offsetHours: 8.5, kosherType: "parve", kosherLabel: "פרווה", name: "ארוחת ביניים אחה\"צ", protein: 24, desc: "קופסת טונה קטנה מסוננת + חצי אבוקדו מועך + פרוסת לחם מלא אחת קלויה בטוסטר.", tip: "טונה במים היא מקור חלבון נקי לחלוטין. אם אתה משתמש בטונה בשמן, סחט אותה היטב." },
+                    { offsetHours: 11.0, kosherType: "parve", kosherLabel: "פרווה", name: "ארוחת ערב", protein: 7, desc: "מרק ירקות עשיר ומסונן (על בסיס גזר, קישוא וסלרי) בתוספת חצי כוס עדשים מבושלות היטב עד ריכוך.", tip: "העדשים נמסות בתוך המרק ומעניקות פתרון פחמימה מורכבת מצוינת וחלבון פרווה נקי." }
+                ]
+            },
+            {
+                name: "תפריט ז' - חזה עוף צרוב וקינואה",
+                macros: { cal: 905, pro: 116, carb: 45, fat: 28 },
+                meals: [
+                    { offsetHours: 0.5, kosherType: "dairy", kosherLabel: "חלבי", name: "ארוחת בוקר", protein: 15, desc: "מקושקשת מ-2 ביצים עם כף בולגרית 5% מגוררת מעל + מלפפון קלוף.", tip: "הבולגרית מוסיפה מליחות נהדרת כך שאין צורך להוסיף מלח לחביתה." },
+                    { offsetHours: 3.0, kosherType: "dairy", kosherLabel: "חלבי", name: "ארוחת ביניים בוקר", protein: 20, desc: "גביע יוגורט פרו/גו 20 ג' חלבון.", tip: "שמור את היוגורט תמיד במקרר - אכילה שלו כשהוא קר מאוד עוזרת להרגיע את הקיבה." },
+                    { offsetHours: 6.0, kosherType: "meat", kosherLabel: "בשרי", name: "ארוחת צהריים", protein: 43, desc: "130 גרם חזה עוף פשוט וצרוב על מחבת פסים חמה + 3 כפות קינואה רכה מאוד.", tip: "כדי שהקינואה תהיה רכה וקלה לעיכול, בשל אותה כמו פסטה (בהרבה מים רותחים) וסנן בסיום." },
+                    { offsetHours: 8.5, kosherType: "parve", kosherLabel: "פרווה", name: "ארוחת ביניים אחה\"צ", protein: 29, desc: "ביצה קשה אחת מרוסקת + קופסת טונה קטנה מסוננת + פרוסת לחם מלא קלויה היטב.", tip: "שילוב של ביצה וטונה נותן פצצת חלבון נקייה, קלה להכנה ומאוד משביעה." },
+                    { offsetHours: 11.0, kosherType: "parve", kosherLabel: "פרווה", name: "ארוחת ערב", protein: 9, desc: "חצי כוס אדממה (פולי סויה) מאודים עם מעט מלח גס ולימון סחוט.", tip: "נשנוש מעולה מול הטלוויזיה, עשיר בסיבים תזונתיים רכים ובחלבון איכותי." }
+                ]
+            },
+            {
+                name: "תפריט ח' - קדירת דייג ים תיכונית קלה",
+                macros: { cal: 936, pro: 101, carb: 51, fat: 37 },
+                meals: [
+                    { offsetHours: 0.5, kosherType: "dairy", kosherLabel: "חלבי", name: "ארוחת בוקר", protein: 15, desc: "2 ביצים מקושקשות עם כף בולגרית 5% מגוררת מעל + מלפפון קלוף.", tip: "טריפת הביצים היטב עם מזלג מכניסה אוויר לתערובת והופכת את המקושקשת לאוורירית וקלה לעיכול." },
+                    { offsetHours: 3.0, kosherType: "dairy", kosherLabel: "חלבי", name: "ארוחת ביניים בוקר", protein: 21, desc: "גביע יוגורט חלבון (וניל או קרמל) + 5 שקדים.", tip: "מעדני חלבון קרים מסייעים לתחושת רעננות ומספקים אנרגיה מהירה." },
+                    { offsetHours: 6.0, kosherType: "parve", kosherLabel: "פרווה", name: "ארוחת צהריים", protein: 29, desc: "130 גרם פילה דג לברק או דניס אפוי בתנור עם שום ולימון + 3 כפות פירה גזר ודלעת מתקתק.", tip: "הנח את הדג על נייר אפייה, שפוך עליו מעט מיץ לימון סחוט, מלח ואבקת שום, ואפה ב-200 מעלות רק 10 דקות." },
+                    { offsetHours: 8.5, kosherType: "parve", kosherLabel: "פרווה", name: "ארוחת ביניים אחה\"צ", protein: 23, desc: "סוגר רעב של אחר הצהריים: קופסת טונה קטנה + חצי אבוקדו מועך + 2 יחידות לחמית.", tip: "האבוקדו מחליף את המיונז ומספק שומנים בריאים (חד-בלתי-רוויים) שחיוניים למפרקים ולשרירים." },
+                    { offsetHours: 11.0, kosherType: "parve", kosherLabel: "פרווה", name: "ארוחת ערב", protein: 13, desc: "מרק עגבניות עשיר בתוספת נטיפי חלבוני ביצה (3 חלבונים מעורבבים פנימה תוך כדי בישול).", tip: "שיטה זו מעשירה את המרק בחלבון מלא בלי לשנות את המרקם החלק שלו." }
+                ]
+            },
+            {
+                name: "תפריט ט' - חזה עוף אפוי ועסיסי",
+                macros: { cal: 1040, pro: 112, carb: 82, fat: 27 },
+                meals: [
+                    { offsetHours: 0.5, kosherType: "dairy", kosherLabel: "חלבי", name: "ארוחת בוקר", protein: 13, desc: "טוסט פתוח: פרוסת לחם מלא אחת עם 2 כפות קוטג' 5% ופרוסת גבינה צהובה 9% מומסת בטוסטר.", tip: "המסת הגבינה הצהובה הופכת את הלחם ליציב יותר ומונעת ממנו להפוך לעיסתי מדי בפה." },
+                    { offsetHours: 3.0, kosherType: "dairy", kosherLabel: "חלבי", name: "ארוחת ביניים בוקר", protein: 20, desc: "גביע מעדן חלבון פרו/גו לבחירתך.", tip: "השתמש במעדן החלבון כנשנוש ביניים מעולה לפני שהרעב האמיתי תוקף." },
+                    { offsetHours: 6.0, kosherType: "meat", kosherLabel: "בשרי", name: "ארוחת צהריים", protein: 41, desc: "130 גרם חזה עוף אפוי פשוט בתבנית מכוסה בנייר כסף + 3 כפות אורז בסמטי רך מאוד.", tip: "אפיית חזה העוף כשהוא מכוסה הרמטית בנייר כסף שומרת על האדים בפנים ומונעת ממנו להתייבש ולהיות קשה." },
+                    { offsetHours: 8.5, kosherType: "parve", kosherLabel: "פרווה", name: "ארוחת ביניים אחה\"צ", protein: 28, desc: "חביתה מביצה אחת + קופסת טונה קטנה מסוננת + 2 יחידות לחמית.", tip: "תכין את החביתה במחבת קטנה כדי שתצא עבה ורכה." },
+                    { offsetHours: 11.0, kosherType: "parve", kosherLabel: "פרווה", name: "ארוחת ערב", protein: 10, desc: "ממרח חומוס ביתי דליל וחם (חצי כוס גרגירים טחונים עם כף טחינה ומים) + קרקר קל אחד.", tip: "מרקם חם ונוזלי קל במיוחד לבליעה לפני השינה ומשרה שקט בבטן." }
+                ]
+            },
+            {
+                name: "תפריט י' - קציצות עוף קלות ונימוחות",
+                macros: { cal: 1125, pro: 107, carb: 55, fat: 55 },
+                meals: [
+                    { offsetHours: 0.5, kosherType: "dairy", kosherLabel: "חלבי", name: "ארוחת בוקר", protein: 24, desc: "גביע יוגורט GO/PRO מועשר בחלבון + כף חמאת בוטנים טבעית מעורבבת היטב.", tip: "חמאת בוטנים טבעית ללא תוספת סוכר היא מקור מצוין לשומנים בריאים ולחלבון." },
+                    { offsetHours: 3.0, kosherType: "dairy", kosherLabel: "חלבי", name: "ארוחת ביניים בוקר", protein: 16, desc: "2 ביצים קשות + 2 כפות גבינה לבנה 5%.", tip: "פזר מעט מלח הימלאיה או פלפל שחור גרוס על הביצים הקשות לשדרוג מהיר של הטעם." },
+                    { offsetHours: 6.0, kosherType: "meat", kosherLabel: "בשרי", name: "ארוחת צהריים", protein: 34, desc: "4 קציצות עוף טחון רכות במיוחד המבושלות במים או במעט רוטב צהוב + 3 כפות פירה בטטה.", tip: "כשמכינים קציצות עוף, הוסף קצת מים לתערובת הבשר לפני הטיגון/בישול כדי להבטיח שהן יישארו סופר רכות." },
+                    { offsetHours: 8.5, kosherType: "parve", kosherLabel: "פרווה", name: "ארוחת ביניים אחה\"צ", protein: 24, desc: "קופסת טונה קטנה מסוננת + חצי אבוקדו בינוני מועך + פרוסת לחם מלא קלויה.", tip: "ערבב פנימה כמה טיפות של שמן זית איכותי ומלח ליצירת מרקם ממרח עשיר." },
+                    { offsetHours: 11.0, kosherType: "parve", kosherLabel: "פרווה", name: "ארוחת ערב", protein: 9, desc: "רבע כוס זרעי דלעת קלופים ולא מומלחים קלות.", tip: "זרעי דלעת עשירים באבץ ובחלבון צמחי, מצוינים לתמיכה במערכת החיסון ובמפרקים." }
+                ]
+            },
+            {
+                name: "תפריט יא' - טופו מוקפץ אסייתי עדין",
+                macros: { cal: 1075, pro: 107, carb: 58, fat: 47 },
+                meals: [
+                    { offsetHours: 0.5, kosherType: "dairy", kosherLabel: "חלבי", name: "ארוחת בוקר", protein: 18, desc: "2 ביצים מקושקשות עם כף אחת גבינת מוצרלה 5% מגוררת מומסת בפנים.", tip: "המוצרלה המומסת קושרת את הביצים והופכת אותן למרקם גמיש וקטיפתי שאינו יבש כלל." },
+                    { offsetHours: 3.0, kosherType: "dairy", kosherLabel: "חלבי", name: "ארוחת ביניים בוקר", protein: 20, desc: "גביע יוגורט חלבון GO/PRO בטעם טבעי או פירות יער.", tip: "מנות יוגורט מוכנות הן פתרון מדהים לאכילה נוחה מחוץ לבית כשאתה בלימודים או בסידורים." },
+                    { offsetHours: 6.0, kosherType: "parve", kosherLabel: "פרווה", name: "ארוחת צהריים", protein: 22, desc: "200 גרם קוביות טופו יציב מוקפצות במחבת עם כף שמן שומשום ורוטב סויה דל נתרן + כוס פרחי ברוקולי מאודים ורכים מאוד.", tip: "השרה את הטופו ברוטב סויה 10 דקות לפני ההקפצה כדי שיספוג את כל הטעם לתוכו." },
+                    { offsetHours: 8.5, kosherType: "dairy", kosherLabel: "חלבי", name: "ארוחת ביניים אחה\"צ", protein: 24, desc: "יוגורט GO/PRO חלבון לבן פשוט עם כפית אחת קטנה חמאת שקדים טבעית.", tip: "חמאת שקדים משתלבת נהדר ביוגורט ומעניקה לו מתיקות מעודנת של מרציפן." },
+                    { offsetHours: 11.0, kosherType: "parve", kosherLabel: "פרווה", name: "ארוחת ערב", protein: 23, desc: "שקשוקת טונה מהירה: ביצה אחת מבושלת היטב ברוטב עגבניות יחד עם חצי קופסת טונה מעורבבת בתוך הרוטב.", tip: "הטונה סופגת את מיצי העגבניות והופכת לרכה וטעימה במיוחד בליווי חצי פרוסת לחם מלא קלוי." }
+                ]
+            },
+            {
+                name: "תפריט יב' - דג אמנון ופירה בטטה קטיפתי",
+                macros: { cal: 920, pro: 106, carb: 48, fat: 35 },
+                meals: [
+                    { offsetHours: 0.5, kosherType: "dairy", kosherLabel: "חלבי", name: "ארוחת בוקר", protein: 34, desc: "שייק חלבון: כוס חלב 3% מועשר + כף מדידה אחת של אבקת חלבון מי גבינה + חצי בננה קטנה.", tip: "שתיית שייק חלבון בבוקר היא הדרך הקלה והמהירה ביותר להתחיל את היום עם כמות חלבון עצומה בלי להעמיס נפח על הקיבה." },
+                    { offsetHours: 3.0, kosherType: "dairy", kosherLabel: "חלבי", name: "ארוחת ביניים בוקר", protein: 15, desc: "חצי גביע קוטג' 5% עם רצועות דקות של מלפפון ללא קליפה.", tip: "הקוטג' מכיל חלבון קזאין שמתעכל לאט ומזין את השרירים לאורך מספר שעות." },
+                    { offsetHours: 6.0, kosherType: "parve", kosherLabel: "פרווה", name: "ארוחת צהריים", protein: 25, desc: "120 גרם פילה אמנון (מושט) אפוי בתנור עם שמן זית, פפריקה ומלח + 3 כפות פירה בטטה רך.", tip: "פזר מעט כמון על הדג לפני האפייה כדי להעניק לו ארומה מזרח תיכונית משגעת." },
+                    { offsetHours: 8.5, kosherType: "dairy", kosherLabel: "חלבי", name: "ארוחת ביניים אחה\"צ", protein: 12, desc: "2 פרוסות גבינה צהובה 9% מגולגלות סביב מקל מלפפון קלוף.", tip: "חטיף חלבון מהיר ונוח לביצוע ללא בישול כלל." },
+                    { offsetHours: 11.0, kosherType: "parve", kosherLabel: "פרווה", name: "ארוחת ערב", protein: 20, desc: "קופסת טונה קטנה מסוננת מעורבבת עם רבע אבוקדו מועך ומעט בצל ירוק קצוץ דק.", tip: "הבצל הירוק נותן בעיטה מעולה של טעם רענן לטונה הפשוטה." }
+                ]
+            }
+        ];
+
+        let timerInterval = null;
+        let timerSeconds = 30 * 60; // 30 minutes in seconds
+        let timerRunning = false;
+        let currentActiveMenuIndex = -1;
+        let selectedMealsState = {}; // Keeps track of checked meals for the current menu
+        let globalWakeUpTime = "08:00"; // Default wake-up time
+
+        function toggleWaterTimer() {
+            const btn = document.getElementById('startTimerBtn');
+            const display = document.getElementById('timerDisplay');
+            
+            if (timerRunning) {
+                // Stop timer
+                clearInterval(timerInterval);
+                timerRunning = false;
+                timerSeconds = 30 * 60;
+                btn.innerHTML = `<i data-lucide="timer" class="w-3.5 h-3.5"></i><span>הפעל</span>`;
+                display.innerText = "הפעל טיימר של 30 דקות בסיום הביס";
+                display.className = "text-xs text-stone-500";
+                lucide.createIcons();
+            } else {
+                // Start timer
+                timerRunning = true;
+                btn.innerHTML = `<i data-lucide="circle-stop" class="w-3.5 h-3.5"></i><span>עצור</span>`;
+                btn.classList.add('bg-red-600', 'hover:bg-red-700');
+                btn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+                lucide.createIcons();
+                
+                timerInterval = setInterval(() => {
+                    timerSeconds--;
+                    let mins = Math.floor(timerSeconds / 60);
+                    let secs = timerSeconds % 60;
+                    display.innerText = `מותר לשתות בעוד: ${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')} דקות`;
+                    display.className = "text-xs text-blue-600 font-bold animate-pulse";
+                    
+                    if (timerSeconds <= 0) {
+                        clearInterval(timerInterval);
+                        display.innerText = "מעולה! מותר לך לשתות כעת! 💧";
+                        display.className = "text-xs text-emerald-600 font-extrabold";
+                        btn.innerHTML = `<i data-lucide="check" class="w-3.5 h-3.5"></i><span>הושלם</span>`;
+                        btn.classList.remove('bg-red-600', 'hover:bg-red-700');
+                        btn.classList.add('bg-emerald-600');
+                        lucide.createIcons();
+                    }
+                }, 1000);
             }
         }
 
-        function resetViz() {
-            var container = document.getElementById('tableauViz');
-            container.innerHTML = '<div class="viz-loading">' +
-                '<div class="loading-content">' +
-                '<div class="loading-bars">' +
-                '<div class="loading-bar"></div>' +
-                '<div class="loading-bar"></div>' +
-                '<div class="loading-bar"></div>' +
-                '<div class="loading-bar"></div>' +
-                '<div class="loading-bar"></div>' +
-                '</div>' +
-                '<p style="color: rgba(255,255,255,0.5); font-size: 14px;">טוען מחדש את הדשבורד...</p>' +
-                '</div></div>';
-
-            if (vizInstance) {
-                vizInstance.dispose();
-                vizInstance = null;
+        function updateWakeUpTime(timeVal) {
+            globalWakeUpTime = timeVal;
+            if (currentActiveMenuIndex !== -1) {
+                renderMenu(currentActiveMenuIndex);
             }
-
-            setTimeout(function() {
-                initTableau();
-            }, 500);
         }
 
-        // Initialize when DOM is ready
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', function() {
-                setTimeout(initTableau, 1000);
+        function setToNowTime() {
+            const now = new Date();
+            const hours = now.getHours().toString().padStart(2, '0');
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            const timeStr = `${hours}:${minutes}`;
+            document.getElementById('wakeUpTimeInput').value = timeStr;
+            updateWakeUpTime(timeStr);
+        }
+
+        function calculateMealTime(wakeTimeStr, offsetHours) {
+            const [wHours, wMinutes] = wakeTimeStr.split(':').map(Number);
+            const wakeDate = new Date();
+            wakeDate.setHours(wHours, wMinutes, 0, 0);
+            
+            // Add offset hours
+            const offsetMs = offsetHours * 60 * 60 * 1000;
+            const mealDate = new Date(wakeDate.getTime() + offsetMs);
+            
+            const hours = mealDate.getHours().toString().padStart(2, '0');
+            const minutes = mealDate.getMinutes().toString().padStart(2, '0');
+            return `${hours}:${minutes}`;
+        }
+
+        window.onload = function() {
+            const selectEl = document.getElementById('directMenuSelect');
+            menus.forEach((m, idx) => {
+                const opt = document.createElement('option');
+                opt.value = idx;
+                opt.innerText = m.name;
+                selectEl.appendChild(opt);
             });
-        } else {
-            setTimeout(initTableau, 1000);
+            
+            // Generate icons
+            lucide.createIcons();
         }
 
-        // ============================================
-        // Smooth scroll for anchor links
-        // ============================================
-        document.querySelectorAll('a[href^="#"]').forEach(function(anchor) {
-            anchor.addEventListener('click', function(e) {
-                e.preventDefault();
-                var targetId = this.getAttribute('href');
-                var target = document.querySelector(targetId);
-                if (target) {
-                    var offset = 80;
-                    var targetPosition = target.getBoundingClientRect().top + window.pageYOffset - offset;
-                    window.scrollTo({
-                        top: targetPosition,
-                        behavior: 'smooth'
-                    });
+        function updateProteinTracker() {
+            const menu = menus[currentActiveMenuIndex];
+            if (!menu) return;
+
+            let totalTarget = menu.macros.pro;
+            let consumed = 0;
+
+            menu.meals.forEach((meal, idx) => {
+                const key = `${currentActiveMenuIndex}_${idx}`;
+                if (selectedMealsState[key]) {
+                    consumed += meal.protein;
                 }
             });
-        });
+
+            // Update stats text
+            document.getElementById('trackerStats').innerText = `נצרך: ${consumed} גרם מתוך ${totalTarget} גרם חלבון`;
+            
+            // Update visual progress bar width
+            const percentage = Math.min((consumed / totalTarget) * 100, 100);
+            document.getElementById('trackerProgressBar').style.width = percentage + '%';
+        }
+
+        function toggleMealCheck(mealIdx, protein) {
+            const key = `${currentActiveMenuIndex}_${mealIdx}`;
+            const checkbox = document.getElementById(`chk_${mealIdx}`);
+            const mealCard = document.getElementById(`mealCard_${mealIdx}`);
+            
+            if (checkbox.checked) {
+                selectedMealsState[key] = true;
+                mealCard.classList.add('bg-emerald-50/40', 'border-emerald-200');
+                mealCard.classList.remove('border-stone-100');
+            } else {
+                selectedMealsState[key] = false;
+                mealCard.classList.remove('bg-emerald-50/40', 'border-emerald-200');
+                mealCard.classList.add('border-stone-100');
+            }
+
+            updateProteinTracker();
+        }
+
+        function renderMenu(menuIndex) {
+            currentActiveMenuIndex = menuIndex;
+            const menu = menus[menuIndex];
+            const outputCont = document.getElementById('outputContainer');
+            
+            // Fade-in animation helper
+            outputCont.classList.remove('hidden');
+            outputCont.classList.add('opacity-0', 'scale-95');
+            
+            setTimeout(() => {
+                document.getElementById('menuName').innerText = menu.name;
+                
+                // Set Macros in visual header
+                document.getElementById('cal').innerText = menu.macros.cal;
+                document.getElementById('pro').innerText = menu.macros.pro + 'g';
+                document.getElementById('carb').innerText = menu.macros.carb + 'g';
+                document.getElementById('fat').innerText = menu.macros.fat + 'g';
+
+                // Update Visual Macro Bars (Scale from 0 to 100%)
+                document.getElementById('calBar').style.width = Math.min((menu.macros.cal / 1200) * 100, 100) + '%';
+                document.getElementById('proBar').style.width = Math.min((menu.macros.pro / 120) * 100, 100) + '%';
+                document.getElementById('carbBar').style.width = Math.min((menu.macros.carb / 100) * 100, 100) + '%';
+                document.getElementById('fatBar').style.width = Math.min((menu.macros.fat / 60) * 100, 100) + '%';
+
+                // Reset tracker UI for this menu
+                updateProteinTracker();
+
+                // Build Meals List
+                const mealsContainer = document.getElementById('mealsContainer');
+                mealsContainer.innerHTML = '';
+
+                menu.meals.forEach((meal, idx) => {
+                    const kosherStyles = {
+                        dairy: { bg: 'bg-blue-50', text: 'text-blue-700', border: 'border-blue-200' },
+                        meat: { bg: 'bg-red-50', text: 'text-red-700', border: 'border-red-200' },
+                        parve: { bg: 'bg-emerald-50', text: 'text-emerald-700', border: 'border-emerald-200' }
+                    };
+                    const styling = kosherStyles[meal.kosherType] || kosherStyles.parve;
+                    const calculatedTime = calculateMealTime(globalWakeUpTime, meal.offsetHours);
+                    const key = `${menuIndex}_${idx}`;
+                    const isChecked = selectedMealsState[key] ? 'checked' : '';
+                    const highlightClass = isChecked ? 'bg-emerald-50/40 border-emerald-200' : 'border-stone-100';
+
+                    const mealDiv = document.createElement('div');
+                    mealDiv.id = `mealCard_${idx}`;
+                    mealDiv.className = `relative pr-2 p-3 rounded-2xl border transition duration-150 ${highlightClass}`;
+                    mealDiv.innerHTML = `
+                        <!-- Timeline circle dot -->
+                        <div class="absolute right-[-27px] top-4 w-3 h-3 rounded-full bg-brand-500 border-2 border-white shadow-sm"></div>
+                        
+                        <div class="flex items-start gap-3">
+                            <!-- Custom Checklist Checkbox -->
+                            <div class="flex items-center h-5 mt-1">
+                                <input id="chk_${idx}" type="checkbox" ${isChecked} onchange="toggleMealCheck(${idx}, ${meal.protein})" class="w-5 h-5 text-emerald-600 bg-stone-100 border-stone-300 rounded focus:ring-emerald-500 cursor-pointer">
+                            </div>
+                            
+                            <div class="flex-1">
+                                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-1">
+                                    <div class="flex items-center gap-2">
+                                        <span class="px-2 py-0.5 text-[10px] font-extrabold rounded-md ${styling.bg} ${styling.text} border ${styling.border}">
+                                            ${meal.kosherLabel}
+                                        </span>
+                                        <span class="text-xs font-bold text-stone-400">${calculatedTime}</span>
+                                        <span class="text-xs font-extrabold text-emerald-600">(${meal.protein}g חלבון)</span>
+                                    </div>
+                                    <h4 class="text-sm font-extrabold text-stone-800">${meal.name || 'ארוחה קלה'}</h4>
+                                </div>
+                                <p class="text-stone-600 text-sm leading-relaxed">${meal.desc}</p>
+                                
+                                <!-- Chef cooking tip -->
+                                <div class="mt-2 p-2 bg-amber-50/50 rounded-lg border border-amber-100/60 flex items-start gap-1.5 text-xs text-amber-800">
+                                    <i data-lucide="chef-hat" class="w-4 h-4 text-amber-600 shrink-0 mt-0.5"></i>
+                                    <div><strong>טיפ להכנה מנצחת:</strong> ${meal.tip}</div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    mealsContainer.appendChild(mealDiv);
+                });
+
+                outputCont.classList.remove('opacity-0', 'scale-95');
+                outputCont.classList.add('opacity-100', 'scale-100');
+                
+                // Trigger dynamic icons render
+                lucide.createIcons();
+                updateProteinTracker();
+                
+                // Smooth scroll to output container
+                outputCont.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }, 150);
+        }
+
+        function rollMenu() {
+            let randomIndex;
+            do {
+                randomIndex = Math.floor(Math.random() * menus.length);
+            } while (randomIndex === currentActiveMenuIndex && menus.length > 1);
+
+            currentActiveMenuIndex = randomIndex;
+            
+            // Sync dropdown select visual
+            document.getElementById('directMenuSelect').value = randomIndex;
+            
+            renderMenu(randomIndex);
+        }
+
+        function loadSelectedMenu(indexVal) {
+            const index = parseInt(indexVal);
+            if (!isNaN(index)) {
+                currentActiveMenuIndex = index;
+                renderMenu(index);
+            }
+        }
     </script>
 </body>
 </html>
-
