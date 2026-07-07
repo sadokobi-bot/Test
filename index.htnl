@@ -3,664 +3,684 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>קובי - תפריט מנצח לאחר קיצור קיבה</title>
-    <!-- Tailwind CSS CDN -->
+    <title>מבחן האתגר: מדע הנתונים למתקדמים</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts: Heebo & Assistant for modern Hebrew typography -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;600;700;800&family=Heebo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
-    <!-- Lucide Icons via CDN for beautiful glyphs -->
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Assistant', 'Heebo', 'sans-serif'],
-                    },
-                    colors: {
-                        brand: {
-                            50: '#f4f7f5',
-                            100: '#e5ebe6',
-                            500: '#4a6b53', // Sage Green primary
-                            600: '#3e5945',
-                            700: '#2f4334',
-                            deep: '#1e2d22',
-                        },
-                        kosher: {
-                            dairy: '#3b82f6', // Blue
-                            meat: '#ef4444',  // Red
-                            parve: '#10b981'  // Green
-                        }
-                    }
-                }
-            }
-        }
-    </script>
     <style>
+        :root {
+            --primary: #8b5cf6; /* Violet */
+            --secondary: #06b6d4; /* Cyan */
+            --bg-dark: #0f172a; /* Slate 900 */
+        }
         body {
-            background: linear-gradient(135deg, #f3f6f4 0%, #e9efe9 100%);
+            font-family: 'Heebo', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            color: #f8fafc;
             min-height: 100vh;
+            overflow-x: hidden;
         }
-        /* Custom scrollbar for beautiful menus */
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
+        
+        /* Glassmorphism utilities */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
         }
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 10px;
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #8b5cf6; border-radius: 4px; }
+        
+        /* Animations */
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade-in { animation: fadeIn 0.5s ease-out forwards; }
+        
+        /* Option Buttons */
+        .option-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        ::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 10px;
+        .option-btn:hover:not(:disabled) {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--secondary);
+            transform: translateX(-5px);
         }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8;
+        .option-btn.correct {
+            background: rgba(16, 185, 129, 0.2) !important;
+            border-color: #10b981 !important;
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.3);
         }
+        .option-btn.incorrect {
+            background: rgba(239, 68, 68, 0.2) !important;
+            border-color: #ef4444 !important;
+        }
+        .option-btn:disabled { cursor: not-allowed; opacity: 0.6; }
+        .option-btn.correct:disabled, .option-btn.incorrect:disabled { opacity: 1; }
+
+        /* Progress Bar Glow */
+        .progress-glow { box-shadow: 0 0 10px var(--secondary); }
     </style>
 </head>
-<body class="font-sans antialiased text-stone-800 pb-16">
+<body class="flex items-center justify-center p-4 sm:p-6">
 
-    <!-- Top Decorative bar -->
-    <div class="w-full h-2 bg-gradient-to-r from-emerald-600 via-amber-500 to-emerald-800"></div>
-
-    <div class="max-w-4xl mx-auto px-4 sm:px-6">
+    <div id="app" class="max-w-4xl w-full glass-panel rounded-3xl overflow-hidden relative">
         
-        <!-- Header Section -->
-        <header class="text-center my-8 md:my-12">
-            <div class="inline-flex items-center justify-center p-3 bg-brand-500/10 rounded-full mb-4">
-                <i data-lucide="utensils-cross" class="w-8 h-8 text-brand-500"></i>
-            </div>
-            <h1 class="text-3xl md:text-4xl font-extrabold text-brand-deep tracking-tight">התפריט הבריא של קובי</h1>
-            <p class="text-stone-500 mt-2 text-md md:text-lg font-medium max-w-md mx-auto">
-                מחולל תפריטים מועשרי חלבון (95g+), מותאמים אישית לבני 24 שמתאמנים
-            </p>
-        </header>
+        <!-- Decorative Background Elements -->
+        <div class="absolute top-[-100px] left-[-100px] w-64 h-64 bg-violet-600 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse"></div>
+        <div class="absolute bottom-[-100px] right-[-100px] w-64 h-64 bg-cyan-600 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse" style="animation-delay: 2s;"></div>
 
-        <!-- Dynamic Wake-up Time Configuration Card -->
-        <div class="bg-white rounded-3xl p-6 shadow-md border border-stone-100 mb-6 transition-all duration-300">
-            <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
-                <div class="flex items-center gap-3">
-                    <div class="p-2.5 bg-amber-500/10 text-amber-600 rounded-2xl">
-                        <i data-lucide="alarm-clock" class="w-6 h-6 animate-pulse"></i>
+        <!-- START SCREEN -->
+        <div id="start-screen" class="p-8 sm:p-16 text-center animate-fade-in relative z-10">
+            <div class="inline-block p-4 rounded-full bg-violet-500/20 text-violet-400 mb-6 border border-violet-500/30">
+                <i class="fa-solid fa-brain text-5xl"></i>
+            </div>
+            <h1 class="text-4xl sm:text-5xl font-extrabold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-violet-400 to-cyan-400">
+                אתגר מדע הנתונים
+            </h1>
+            <p class="text-slate-300 text-lg sm:text-xl mb-8 max-w-2xl mx-auto leading-relaxed">
+                חושב שאתה מוכן למבחן? 60 שאלות קצה שבודקות הבנה עמוקה, מקרי קיצון ומלכודות. רשתות נוירונים, כוונון מודלים, זליגת נתונים ופנדס למתקדמים.
+            </p>
+            <button onclick="startQuiz()" class="group relative px-8 py-4 bg-gradient-to-r from-violet-600 to-indigo-600 rounded-full font-bold text-lg hover:from-violet-500 hover:to-indigo-500 transition-all shadow-[0_0_20px_rgba(139,92,246,0.5)] hover:shadow-[0_0_30px_rgba(139,92,246,0.8)] focus:outline-none">
+                <span class="mr-2">התחל באתגר</span>
+                <i class="fa-solid fa-rocket group-hover:translate-x-1 transition-transform"></i>
+            </button>
+        </div>
+
+        <!-- QUIZ SCREEN -->
+        <div id="quiz-screen" class="hidden flex flex-col min-h-[600px] relative z-10">
+            
+            <!-- Header & Progress -->
+            <div class="p-6 border-b border-white/10 bg-black/20">
+                <div class="flex justify-between items-center mb-4">
+                    <div class="text-cyan-400 font-semibold tracking-wide">
+                        <i class="fa-solid fa-layer-group ml-2"></i>שאלה <span id="current-q-num">1</span> / 60
                     </div>
-                    <div class="text-right">
-                        <h3 class="font-extrabold text-stone-800 text-base">מתי התעוררת היום?</h3>
-                        <p class="text-xs text-stone-500">שעות הארוחות יתעדכנו אוטומטית לפי שעת היקיצה שלך</p>
+                    <div class="bg-violet-500/20 border border-violet-500/30 px-4 py-1.5 rounded-full text-violet-300 font-bold">
+                        <i class="fa-solid fa-star ml-2"></i><span id="score-display">0</span> נק'
                     </div>
                 </div>
-                <div class="flex items-center gap-2">
-                    <input type="time" id="wakeUpTimeInput" value="08:00" onchange="updateWakeUpTime(this.value)" class="bg-stone-50 border border-stone-200 text-stone-800 rounded-xl p-2.5 font-bold text-base outline-none focus:ring-2 focus:ring-brand-500 transition cursor-pointer">
-                    <button onclick="setToNowTime()" class="px-3 py-2.5 bg-stone-100 hover:bg-stone-200 text-stone-700 font-bold rounded-xl text-xs transition active:scale-95 flex items-center gap-1">
-                        <i data-lucide="clock" class="w-4 h-4"></i>
-                        <span>עכשיו</span>
+                <div class="w-full bg-slate-800 rounded-full h-2">
+                    <div id="progress-bar" class="bg-gradient-to-r from-cyan-400 to-violet-500 h-2 rounded-full progress-glow transition-all duration-500" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <!-- Question Area -->
+            <div class="flex-grow p-6 sm:p-8 flex flex-col justify-center">
+                <h2 id="question-text" class="text-2xl sm:text-3xl font-bold leading-tight mb-8 text-white"></h2>
+                
+                <div id="options-container" class="space-y-4 w-full max-w-3xl mx-auto">
+                    <!-- Options injected here -->
+                </div>
+
+                <!-- Feedback Area -->
+                <div id="feedback-area" class="hidden mt-8 p-6 rounded-2xl border animate-fade-in">
+                    <div class="flex items-center mb-3">
+                        <i id="feedback-icon" class="text-2xl ml-3"></i>
+                        <h3 id="feedback-title" class="text-xl font-bold"></h3>
+                    </div>
+                    <p id="feedback-rationale" class="text-slate-300 leading-relaxed"></p>
+                    
+                    <button id="next-btn" onclick="nextQuestion()" class="mt-6 w-full py-3 bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl font-bold transition-all focus:outline-none flex justify-center items-center">
+                        המשך לשאלה הבאה <i class="fa-solid fa-arrow-left mr-2"></i>
                     </button>
                 </div>
             </div>
         </div>
 
-        <!-- Quick Info Banner -->
-        <div class="bg-white/80 backdrop-blur-sm border border-brand-100 rounded-2xl p-4 mb-8 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div class="flex items-center gap-3">
-                <div class="p-2 bg-amber-500/10 text-amber-600 rounded-xl">
-                    <i data-lucide="shield-check" class="w-5 h-5"></i>
-                </div>
-                <div class="text-right">
-                    <h4 class="font-bold text-stone-800 text-sm">הפרדת בשר וחלב מובנית</h4>
-                    <p class="text-xs text-stone-500">תפריטים כשרים המותאמים בדיוק לאימונים שלך</p>
-                </div>
+        <!-- RESULTS SCREEN -->
+        <div id="result-screen" class="hidden p-8 sm:p-16 text-center animate-fade-in relative z-10">
+            <div id="result-icon-container" class="inline-block p-6 rounded-full mb-6 border-4">
+                <i id="result-icon" class="text-6xl"></i>
             </div>
+            <h2 id="result-title" class="text-4xl font-black mb-2"></h2>
+            <p id="result-subtitle" class="text-xl text-slate-400 mb-8"></p>
             
-            <div class="h-px w-full sm:h-8 sm:w-px bg-stone-200"></div>
+            <div class="text-7xl font-black mb-8 bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-violet-400 drop-shadow-lg">
+                <span id="final-score"></span>/60
+            </div>
 
-            <!-- Bariatric Hydration Helper -->
-            <div id="waterTimerWidget" class="flex items-center justify-between gap-4 w-full sm:w-auto">
-                <div class="flex items-center gap-2">
-                    <div class="p-2 bg-blue-500/10 text-blue-600 rounded-xl">
-                        <i data-lucide="droplet" class="w-5 h-5"></i>
-                    </div>
-                    <div class="text-right">
-                        <h4 class="font-bold text-stone-800 text-sm">הפרדת נוזלים מאוכל</h4>
-                        <p id="timerDisplay" class="text-xs text-stone-500">הפעל טיימר של 30 דקות בסיום הביס</p>
-                    </div>
-                </div>
-                <button id="startTimerBtn" onclick="toggleWaterTimer()" class="px-4 py-1.5 bg-blue-600 text-white font-bold rounded-lg text-xs hover:bg-blue-700 transition active:scale-95 flex items-center gap-1">
-                    <i data-lucide="timer" class="w-3.5 h-3.5"></i>
-                    <span>הפעל</span>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center mt-8">
+                <button onclick="shareResults()" class="px-8 py-3 bg-green-500 hover:bg-green-400 text-white rounded-xl font-bold transition-all shadow-lg hover:shadow-green-500/50 flex justify-center items-center">
+                    <i class="fa-brands fa-whatsapp ml-2 text-xl"></i> שתף תוצאה
+                </button>
+                <button onclick="location.reload()" class="px-8 py-3 bg-white/10 hover:bg-white/20 border border-white/20 text-white rounded-xl font-bold transition-all flex justify-center items-center">
+                    <i class="fa-solid fa-rotate-right ml-2"></i> נסה שוב
                 </button>
             </div>
+            <p id="share-toast" class="text-green-400 mt-4 opacity-0 transition-opacity">הטקסט הועתק ללוח!</p>
         </div>
-
-        <!-- Action / Interactive Control Hub -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            
-            <!-- Quick Menu Selector Card -->
-            <div class="bg-white rounded-3xl p-6 shadow-md border border-stone-100 flex flex-col justify-between h-full">
-                <div>
-                    <h3 class="text-lg font-bold text-brand-deep flex items-center gap-2 mb-2">
-                        <i data-lucide="bookmark-check" class="w-5 h-5 text-brand-500"></i>
-                        בחירה מהירה
-                    </h3>
-                    <p class="text-stone-500 text-sm mb-4">מעדיף לא להגריל? בחר ישירות את אחד מעשרת התפריטים המועשרים:</p>
-                </div>
-                <select id="directMenuSelect" onchange="loadSelectedMenu(this.value)" class="w-full bg-stone-50 border border-stone-200 text-stone-800 rounded-xl p-3 font-semibold text-sm outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition cursor-pointer">
-                    <option value="" disabled selected>-- בחר תפריט --</option>
-                    <!-- Options loaded dynamically -->
-                </select>
-            </div>
-
-            <!-- Big Interactive Roll Button Card -->
-            <div class="bg-gradient-to-br from-brand-500 to-brand-700 rounded-3xl p-6 shadow-xl flex flex-col items-center justify-center text-center text-white md:col-span-2 group relative overflow-hidden">
-                <div class="absolute -right-10 -bottom-10 opacity-10 pointer-events-none transition-transform duration-700 group-hover:scale-125">
-                    <i data-lucide="dices" class="w-48 h-48"></i>
-                </div>
-                <i data-lucide="sparkles" class="w-8 h-8 text-amber-300 mb-2 animate-bounce"></i>
-                <h2 class="text-xl font-extrabold mb-1">לא יודע מה בא לך לאכול היום?</h2>
-                <p class="text-brand-100/90 text-sm max-w-sm mb-5">ניתן למערכת לבחור בשבילך תפריט יומי עשיר במיוחד בחלבון וקל לעיכול!</p>
-                <button onclick="rollMenu()" class="px-8 py-3.5 bg-amber-400 text-brand-deep font-black rounded-full shadow-lg hover:bg-amber-300 transition duration-300 transform hover:scale-105 active:scale-95 flex items-center gap-2 text-md">
-                    <i data-lucide="dices" class="w-5 h-5"></i>
-                    <span>הגרל לי תפריט יומי</span>
-                </button>
-            </div>
-        </div>
-
-        <!-- Output Main Screen Card -->
-        <div id="outputContainer" class="hidden">
-            <div id="menuCard" class="bg-white rounded-3xl shadow-xl border border-stone-100 overflow-hidden transform transition-all duration-300">
-                
-                <!-- Card Header -->
-                <div class="bg-gradient-to-r from-stone-900 to-brand-deep p-6 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                    <div class="flex items-center gap-3">
-                        <div class="p-3 bg-brand-500/20 rounded-2xl">
-                            <i data-lucide="heart-pulse" class="w-6 h-6 text-amber-400"></i>
-                        </div>
-                        <div>
-                            <span class="text-xs font-bold text-amber-400 uppercase tracking-widest">נבחר עבורך</span>
-                            <h2 id="menuName" class="text-xl font-extrabold mt-0.5">שם התפריט שיופיע</h2>
-                        </div>
-                    </div>
-                    <div class="inline-flex items-center gap-1.5 px-3 py-1 bg-white/10 rounded-full text-xs font-bold border border-white/20">
-                        <i data-lucide="award" class="w-3.5 h-3.5 text-amber-300"></i>
-                        <span>חלבון מוגבר למתאמנים</span>
-                    </div>
-                </div>
-
-                <!-- Macro Nutrients Dash -->
-                <div class="bg-stone-50 border-b border-stone-100 p-6">
-                    <h4 class="text-stone-400 text-xs font-bold uppercase tracking-wider mb-4 text-center">ערכים תזונתיים משוערכים ליום שלם</h4>
-                    <div class="grid grid-cols-4 gap-4 mb-6">
-                        
-                        <!-- Calories -->
-                        <div class="bg-white p-3 rounded-2xl shadow-sm border border-stone-100 text-center">
-                            <span id="cal" class="block text-xl sm:text-2xl font-extrabold text-stone-800 font-sans">0</span>
-                            <span class="text-[10px] sm:text-xs font-bold text-stone-400 block mt-1">קלוריות</span>
-                            <div class="w-full bg-stone-100 h-1.5 rounded-full mt-2 overflow-hidden">
-                                <div id="calBar" class="bg-amber-400 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
-                            </div>
-                        </div>
-
-                        <!-- Protein Target -->
-                        <div class="bg-white p-3 rounded-2xl shadow-sm border border-stone-100 text-center">
-                            <span id="pro" class="block text-xl sm:text-2xl font-extrabold text-emerald-600 font-sans">0</span>
-                            <span class="text-[10px] sm:text-xs font-bold text-stone-400 block mt-1">חלבון יעד</span>
-                            <div class="w-full bg-stone-100 h-1.5 rounded-full mt-2 overflow-hidden">
-                                <div id="proBar" class="bg-emerald-500 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
-                            </div>
-                        </div>
-
-                        <!-- Carbs -->
-                        <div class="bg-white p-3 rounded-2xl shadow-sm border border-stone-100 text-center">
-                            <span id="carb" class="block text-xl sm:text-2xl font-extrabold text-blue-600 font-sans">0</span>
-                            <span class="text-[10px] sm:text-xs font-bold text-stone-400 block mt-1">פחמימות</span>
-                            <div class="w-full bg-stone-100 h-1.5 rounded-full mt-2 overflow-hidden">
-                                <div id="carbBar" class="bg-blue-500 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
-                            </div>
-                        </div>
-
-                        <!-- Fat -->
-                        <div class="bg-white p-3 rounded-2xl shadow-sm border border-stone-100 text-center">
-                            <span id="fat" class="block text-xl sm:text-2xl font-extrabold text-purple-600 font-sans">0</span>
-                            <span class="text-[10px] sm:text-xs font-bold text-stone-400 block mt-1">שומן</span>
-                            <div class="w-full bg-stone-100 h-1.5 rounded-full mt-2 overflow-hidden">
-                                <div id="fatBar" class="bg-purple-500 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
-                            </div>
-                        </div>
-
-                    </div>
-
-                    <!-- Interactive Protein Tracker Box -->
-                    <div class="bg-emerald-50 border border-emerald-100 rounded-2xl p-4">
-                        <div class="flex items-center justify-between mb-2">
-                            <div class="flex items-center gap-2">
-                                <i data-lucide="check-square" class="w-5 h-5 text-emerald-600"></i>
-                                <span class="font-bold text-stone-800 text-sm">מד חלבון יומי דינמי:</span>
-                            </div>
-                            <span class="text-xs font-extrabold text-emerald-800" id="trackerStats">נצרך: 0 גרם מתוך 0 גרם</span>
-                        </div>
-                        <div class="w-full bg-emerald-200/50 h-3 rounded-full overflow-hidden">
-                            <div id="trackerProgressBar" class="bg-emerald-600 h-full rounded-full transition-all duration-300" style="width: 0%"></div>
-                        </div>
-                        <p class="text-[10px] text-emerald-700/80 mt-1.5 font-medium">סמן וי (V) ליד הארוחות שאכלת למטה כדי לראות את כמות החלבון מתעדכנת!</p>
-                    </div>
-                </div>
-
-                <!-- Meals Schedule -->
-                <div class="p-6">
-                    <h3 class="text-stone-500 text-xs font-bold uppercase tracking-wider mb-6 flex items-center gap-1.5">
-                        <i data-lucide="clock" class="w-4 h-4 text-stone-400"></i>
-                        סדר ארוחות יומי וטיפים להכנה טעימה ורכה
-                    </h3>
-
-                    <div id="mealsContainer" class="space-y-6 relative border-r-2 border-dashed border-stone-200 pr-5 mr-3">
-                        <!-- Meals generated by JS dynamically -->
-                    </div>
-                </div>
-
-                <!-- Rules / Tips Banner inside card -->
-                <div class="bg-brand-50/50 p-6 border-t border-stone-100 flex flex-col md:flex-row items-start gap-4">
-                    <div class="p-2.5 bg-amber-400/20 text-amber-700 rounded-2xl">
-                        <i data-lucide="lightbulb" class="w-6 h-6"></i>
-                    </div>
-                    <div>
-                        <h4 class="font-bold text-stone-800 text-sm">חוקי הזהב לתזונת ספורט בריאטרית:</h4>
-                        <ul class="text-xs text-stone-500 mt-1.5 space-y-1.5 list-disc list-inside">
-                            <li><strong>חשיבות הלעיסה:</strong> תלעס כל ביס 25-30 פעמים עד שהמרקם פירה לגמרי.</li>
-                            <li><strong>משך הארוחה:</strong> שבו לאכול בנחת. ארוחה צריכה לקחת בערך 20-30 דקות.</li>
-                            <li><strong>לעולם אל תשתה מים יחד עם האוכל.</strong> זה דוחף את האוכל החוצה מהר מדי ומותח את הקיבה.</li>
-                        </ul>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-
     </div>
 
     <script>
-        // Array of menus featuring creative, high protein, completely kosher recipes.
-        // Processed meats (such as pastrami, sausages, etc.) are NOT used.
-        // Dynamic times are calculated via relative offsets in hours since wake-up time.
-        const menus = [
+        const questions = [
+            // --- ML Theory & Data Preprocessing (Leakage, Scaling, Imbalance) ---
             {
-                name: "תפריט א' - הקלאסי והעשיר",
-                macros: { cal: 1172, pro: 119, carb: 70, fat: 42 },
-                meals: [
-                    { offsetHours: 0.5, kosherType: "dairy", kosherLabel: "חלבי", name: "ארוחת בוקר", protein: 20, desc: "חביתה מ-2 ביצים גדולות + 2 יחידות לחמית עם 3 כפות קוטג' 5% + מלפפון קלוף.", tip: "בשביל חביתה רכה ולא יבשה, תוסיף כף מים לביצים לפני הטריפה ותכסה את המחבת בזמן הטיגון." },
-                    { offsetHours: 3.0, kosherType: "dairy", kosherLabel: "חלבי", name: "ארוחת ביניים בוקר", protein: 21, desc: "גביע יוגורט חלבון (GO/PRO) + 5 שקדים בצד.", tip: "אם קשה לך לאכול שקדים יבשים, השהה אותם בכוס מים חמים לכמה דקות וקלף את הקליפה. הם יהיו רכים וקלים לעיכול." },
-                    { offsetHours: 6.0, kosherType: "meat", kosherLabel: "בשרי", name: "ארוחת צהריים", protein: 41, desc: "חזה עוף פרוס דק (130 גרם) עשוי במחבת נון-סטיק + רבע כרוב אפוי בתנור.", tip: "כדי שחזה העוף יישאר עסיסי בטירוף במחבת, טגן אותו עם מכסה סגור על אש בינונית רק 3 דקות לכל צד." },
-                    { offsetHours: 8.5, kosherType: "parve", kosherLabel: "פרווה", name: "ארוחת ביניים אחה\"צ", protein: 24, desc: "קופסת טונה קטנה מסוננת + פרוסת לחם מלא קלויה בטוסטר + חצי אבוקדו בינוני.", tip: "תמעך את הטונה יחד עם האבוקדו, מעט מיץ לימון ומלח. המרקם הקרמי הופך את הטונה לקלה במיוחד לבליעה." },
-                    { offsetHours: 11.0, kosherType: "parve", kosherLabel: "פרווה", name: "ארוחת ערב", protein: 13, desc: "שקשוקה קלה מביצה אחת שלמה + חלבון ביצה נוסף (מבושלים היטב ברוטב עגבניות) + 2 יחידות לחמית.", tip: "בישול השקשוקה עם מכסה סגור יבטיח שהחלמון יתקשה לגמרי, דבר שמקל על העיכול של מנותחים." }
-                ]
+                q: "מהי 'זליגת נתונים' (Data Leakage) בהקשר של נרמול (Scaling)?",
+                options: [
+                    "המרת עמודות טקסט למספרים לפני פיצול הנתונים.",
+                    "ביצוע Scaling על כל ה-DataFrame לפני שמפצלים ל-Train ו-Test, מה שגורם למודל ללמוד נתונים סטטיסטיים מקבוצת הבדיקה.",
+                    "איבוד נתונים במהלך הפעלת dropna() על מערך נתונים גדול.",
+                    "מצב שבו מודל רשת נוירונים שוכח את המשקולות הקודמות שלו."
+                ],
+                answer: 1,
+                rationale: "זוהי שגיאה קלאסית. אם עושים Scaling לכל הנתונים יחד, הממוצע וסטיית התקן יושפעו מנתוני ה-Test. חובה לפצל קודם, לעשות fit רק על ה-Train, ואז transform לשניהם."
             },
             {
-                name: "תפריט ב' - שגרת דג עסיסית ומחוזקת",
-                macros: { cal: 1232, pro: 111, carb: 80, fat: 51 },
-                meals: [
-                    { offsetHours: 0.5, kosherType: "dairy", kosherLabel: "חלבי", name: "ארוחת בוקר", protein: 21, desc: "גביע יוגורט חלבון 3% עם כף שטוחה גרנולה וחצי כפית דבש.", tip: "תן לגרנולה לשבת בתוך היוגורט לפחות 3 דקות לפני האכילה כדי שתרכך לחלוטין ולא תציק בקיבה." },
-                    { offsetHours: 3.0, kosherType: "dairy", kosherLabel: "חלבי", name: "ארוחת ביניים בוקר", protein: 23, desc: "חביתה מ-2 ביצים + פרוסת לחם קלויה עם 2 כפות קוטג' 5% ומעט בולגרית מפוררת.", tip: "קצץ מעט שמיר או פטרוזיליה לתוך הביצים לקבלת טעם רענן ומקצועי של בית קפה." },
-                    { offsetHours: 6.0, kosherType: "parve", kosherLabel: "פרווה", name: "ארוחת צהריים", protein: 31, desc: "130 גרם פילה סלמון או אמנון אפוי בתנור + 3 כפות פירה תפוחי אדמה רך.", tip: "אפה את הדג כשהוא מכוסה בנייר כסף ב-180 מעלות למשך 12 דקות בלבד. הדג יישאר לח, נימוח ומתפרק בקלות." },
-                    { offsetHours: 8.5, kosherType: "parve", kosherLabel: "פרווה", name: "ארוחת ביניים אחה\"צ", protein: 24, desc: "קופסת טונה קטנה מסוננת + חצי אבוקדו מועך עם לימון ומלח + פרוסת לחם מלא קלויה.", tip: "קפוץ את פרוסת הלחם בטוסטר עד שהיא פריכה - לחם קלוי ופריך (צנים) מתעכל בקיבה מקוצרת הרבה יותר טוב מלחם רך שנוטה להידבק." },
-                    { offsetHours: 11.0, kosherType: "parve", kosherLabel: "פרווה", name: "ארוחת ערב", protein: 12, desc: "סלט ביצים מביצה קשה וחלמון נוסף מעוכים עם כפית מיונז לייט + 2 לחמיות דקות.", tip: "ערבב כפית חרדל חריף עם המיונז כדי לתת עומק לטעם בלי להכביד." }
-                ]
+                q: "איזו בעיה המדד F1-Score פותר באופן המיטבי ביותר?",
+                options: [
+                    "התאמת יתר (Overfitting) במודלים עמוקים.",
+                    "רגישות של מודל עץ החלטה לנתונים חריגים.",
+                    "הערכת ביצועים במערכי נתונים עם חוסר איזון קיצוני במחלקות (Imbalanced Data).",
+                    "איטיות בחישוב מרחקים באלגוריתם KNN."
+                ],
+                answer: 2,
+                rationale: "כשיש 99% מחלקה א' ו-1% מחלקה ב', Accuracy יציג 99% גם אם המודל ינחש רק 'א'. F1-Score מאזן בין Precision ל-Recall וחושף את איכות המודל באמת."
             },
             {
-                name: "תפריט ג' - קציצות בשר רכות ברוטב",
-                macros: { cal: 1027, pro: 95, carb: 80, fat: 35 },
-                meals: [
-                    { offsetHours: 0.5, kosherType: "dairy", kosherLabel: "חלבי", name: "ארוחת בוקר", protein: 21, desc: "גביע מעדן חלבון (GO/PRO) וניל או שוקולד + 5 חצאי אגוזי מלך בצד.", tip: "מעדני החלבון נהדרים לסגירת הפינה המתוקה של הבוקר בלי להקפיץ את הסוכר." },
-                    { offsetHours: 3.0, kosherType: "dairy", kosherLabel: "חלבי", name: "ארוחת ביניים בוקר", protein: 13, desc: "פרוסת לחם מלא קלויה (טוסט) עם פרוסת גבינה צהובה 9% מומסת + מלפפון קלוף.", tip: "הסרת קליפת המלפפון חיונית למניעת גזים ותחושת נפיחות אצל מנותחים." },
-                    { offsetHours: 6.0, kosherType: "meat", kosherLabel: "בשרי", name: "ארוחת צהריים", protein: 26, desc: "3 קציצות בקר או עוף רכות שבושלו ברוטב עגבניות פשוט + 3 כפות פתיתים שספגו מהרוטב.", tip: "כדי שהקציצות יהיו רכות במיוחד, תגרד פנימה בצל שלם סחוט - המיצים של הבצל שומרים על מרקם קטיפתי ורך." },
-                    { offsetHours: 8.5, kosherType: "parve", kosherLabel: "פרווה", name: "ארוחת ביניים אחה\"צ", protein: 14, desc: "שקשוקה קלה מביצה אחת שלמה + חלבון ביצה נוסף (מבושלים היטב ברוטב עגבניות) + 2 יחידות לחמית.", tip: "בישול השקשוקה עם מכסה סגור יבטיח שהחלמון יתקשה לגמרי, דבר שמקל על העיכול של מנותחים." },
-                    { offsetHours: 11.0, kosherType: "parve", kosherLabel: "פרווה", name: "ארוחת ערב", protein: 21, desc: "קופסת טונה קטנה במים מסוננת ומעורבבת עם כף שמן זית, מלח, פלפל ולימון סחוט.", tip: "הלימון שובר את הטעם החזק של הטונה ומשאיר אותה לחה ועסיסית." }
-                ]
+                q: "יש לנו עמודה Categorical עם 50 ערכים ייחודיים (למשל, שמות של מדינות). מדוע שימוש ב-One-Hot Encoding (pd.get_dummies) עלול להיות בעייתי כאן?",
+                options: [
+                    "הוא ימיר את הטקסט למספרים שהמודל לא יבין.",
+                    "הוא יצור 50 עמודות חדשות, מה שיוביל לגידול דרמטי במימדיות (Curse of Dimensionality) ועלול לגרום להתאמת יתר.",
+                    "הפונקציה get_dummies עובדת רק על עמודות עם שני ערכים (בינארי).",
+                    "זה לא בעייתי כלל, זו תמיד הדרך הנכונה."
+                ],
+                answer: 1,
+                rationale: "יצירת עשרות עמודות של 0 ו-1 מנפחת את המערך (Sparse Matrix), מעטה את החישוב, ומאלצת את המודל ללמוד משקולת לכל עמודה בנפרד (סכנת Overfitting)."
             },
             {
-                name: "תפריט ד' - שווארמת עוף ביתית במחבת",
-                macros: { cal: 1070, pro: 101, carb: 69, fat: 39 },
-                meals: [
-                    { offsetHours: 0.5, kosherType: "dairy", kosherLabel: "חלבי", name: "ארוחת בוקר", protein: 11, desc: "גביע ייוגורט לבן 3% טבעי מערבב עם כף חמאת בוטנים טבעית וטיפונת דבש.", tip: "השילוב של יוגורט וחמאת בוטנים נותן מרקם קרמי ורך בטירוף, שמקל על הבליעה בשעות הבוקר המוקדמות." },
-                    { offsetHours: 3.0, kosherType: "dairy", kosherLabel: "חלבי", name: "ארוחת ביניים בוקר", protein: 13, desc: "טוסט גבינה צהובה 9% מפרוסת לחם מלא אחת + 2 כפות קוטג' 5% בצד לטבילה.", tip: "הטבילה בקוטג' הלח מונעת מהטוסטר היבש 'להיתקע' ומסייעת למעבר נוח וחלק." },
-                    { offsetHours: 6.0, kosherType: "meat", kosherLabel: "בשרי", name: "ארוחת צהריים", protein: 41, desc: "130 גרם רצועות דקות של שווארמת חזה עוף/פרגית במחבת + 3 כפות פירה תפוחי אדמה ובטטה חלק.", tip: "תקפיץ את השווארמה על אש גבוהה במשך 4 דקות בלבד עם תבלין שווארמה, קצת כורכום ומלח כדי שלא תתייבש." },
-                    { offsetHours: 8.5, kosherType: "parve", kosherLabel: "פרווה", name: "ארוחת ביניים אחה\"צ", protein: 15, desc: "סלט ביצים קליל: 2 ביצים קשות חתוכות עם כפית מיונז לייט, מלח ופלפל + 2 יחידות לחמית.", tip: "מעוך את החלבון והחלמון היטב עם המזלג כדי ליצור מרקם אחיד שעובר בקלות בוושט." },
-                    { offsetHours: 11.0, kosherType: "parve", kosherLabel: "פרווה", name: "ארוחת ערב", protein: 21, desc: "קופסת טונה קטנה מסוננת מעורבבת עם חצי כפית מיונז לייט + 2 יחידות לחמית + מלפפון קלוף.", tip: "לחמית קלה לפירוק ואינה כבדה כמו לחם רגיל בערב." }
-                ]
+                q: "קיבלת ציון ROC AUC של 0.1 למודל סיווג בינארי. מה המסקנה שלך?",
+                options: [
+                    "המודל מצוין ומוכן לשימוש.",
+                    "המודל מבצע ניחוש אקראי גרוע.",
+                    "המודל למעשה מצוין, אבל הפוך! הוא מתייג כל חיובי כשלילי וכל שלילי כחיובי. היפוך התחזיות ייתן מודל עם 0.9 AUC.",
+                    "הנתונים מכילים זליגת נתונים (Leakage) חמורה."
+                ],
+                answer: 2,
+                rationale: "AUC של 0.5 זה ניחוש. AUC מתחת ל-0.5 אומר שהמודל גילה תבנית אמיתית, אבל סיווג אותה הפוך. ערך 0.1 הוא מודל מעולה אם פשוט הופכים את ה-0 ל-1."
             },
             {
-                name: "תפריט ה' - מוקפץ עוף קל ומהיר",
-                macros: { cal: 980, pro: 111, carb: 58, fat: 30 },
-                meals: [
-                    { offsetHours: 0.5, kosherType: "dairy", kosherLabel: "חלבי", name: "ארוחת בוקר", protein: 17, desc: "חביתה או מקושקשת מ-2 ביצים + 2 כפות קוטג' 5% + רבע אבוקדו בינוני.", tip: "טיגון חביתה עם תרסיס שמן זית מונע שומן עודף וכבד בבטן על הבוקר." },
-                    { offsetHours: 3.0, kosherType: "dairy", kosherLabel: "חלבי", name: "ארוחת ביניים בוקר", protein: 21, desc: "גביע יוגורט חלבון טבעי או וניל + 5 שקדים.", tip: "יוגורט חלבון בטעם טבעי הולך מעולה עם כמה טיפות ממתיק טבעי (כמו סטיביה) ללא קלוריות." },
-                    { offsetHours: 6.0, kosherType: "meat", kosherLabel: "בשרי", name: "ארוחת צהריים", protein: 41, desc: "130 גרם חזה עוף חתוך לקוביות קטנות ומוקפץ עם מעט סויה ואבקת שום + 3 כפות אורז בסמטי רך.", tip: "בזמן בישול האורז, הוסף עוד רבע כוס מים מהרגיל כדי שיצא רך ומאוד נוח לעיכול עבור הקיבה." },
-                    { offsetHours: 8.5, kosherType: "parve", kosherLabel: "פרווה", name: "ארוחת ביניים אחה\"צ", protein: 21, desc: "קופסת טונה קטנה מסוננת מעורבבת עם חצי כפית מיונז לייט + 2 יחידות לחמית + מלפפון קלוף.", tip: "לחמית קלה לפירוק ואינה כבדה כמו לחם רגיל בערב." },
-                    { offsetHours: 11.0, kosherType: "parve", kosherLabel: "פרווה", name: "ארוחת ערב", protein: 11, desc: "חביתת חלבונים מ-2 חלבונים (בלי החלמון) עם כף פטרוזיליה קצוצה ופרוסת לחם קלוי אחת.", tip: "החלבון של הביצה קל מאוד לעיכול בערב ומצוין לאחר יום עמוס." }
-                ]
+                q: "מה קורה לאלגוריתם K-Means אם לא מבצעים Scaling לנתונים ויש עמודה אחת בטווח של מיליונים ועמודה בטווח של עשרות?",
+                options: [
+                    "האלגוריתם לא יוכל לרוץ ויזרוק שגיאה.",
+                    "המרחק האוקלידי יישלט כמעט לחלוטין על ידי העמודה של המיליונים, והעמודה הקטנה לא תשפיע על האשכולות.",
+                    "מרכזי האשכולות (Centroids) ימוקמו מחוץ לטווח הנתונים.",
+                    "האלגוריתם יתעלם אוטומטית מעמודת המיליונים."
+                ],
+                answer: 1,
+                rationale: "K-Means מחשב מרחק פיזי (גיאומטרי). ללא Scaling, הפרש של 1,000 במשכורת 'יבלע' לחלוטין הפרש קריטי של 10 שנים בגיל."
+            },
+            
+            // --- Advanced Pandas ---
+            {
+                q: "מהי המשמעות של הפקודה df.dropna(thresh=3)?",
+                options: [
+                    "מוחקת שורות שיש בהן בדיוק 3 ערכים חסרים (NaN).",
+                    "משאירה שורות שיש בהן לפחות 3 ערכים חוקיים (לא NaN).",
+                    "מוחקת עמודות שיש בהן 3 ערכים חסרים ומעלה.",
+                    "מחליפה את 3 הערכים החסרים הראשונים ב-0."
+                ],
+                answer: 1,
+                rationale: "הפרמטר thresh קובע את סף ההישרדות. thresh=3 אומר: תשרוד רק שורה שיש בה לכל הפחות 3 נתונים אמיתיים (שאינם NaN)."
             },
             {
-                name: "תפריט ו' - עוף מפורק ופירה נימוח",
-                macros: { cal: 905, pro: 98, carb: 83, fat: 37 },
-                meals: [
-                    { offsetHours: 0.5, kosherType: "dairy", kosherLabel: "חלבי", name: "ארוחת בוקר", protein: 8, desc: "גביע יוגורט 3% טבעי + כף שטוחה גרנולה וחצי כפית דבש (להשהות לריכוך).", tip: "עדיף לבחור ביוגורט יווני שהוא סמיך יותר ובעל אחוז חלבון גבוה יותר מטבעו." },
-                    { offsetHours: 3.0, kosherType: "dairy", kosherLabel: "חלבי", name: "ארוחת ביניים בוקר", protein: 18, desc: "חביתה מ-2 ביצים + 2 יחידות לחמית עם קוטג' 5%.", tip: "תיבול החביתה בקורט אורגנו יבש מעניק לה טעם עשיר של פיצה בלי הקלוריות." },
-                    { offsetHours: 6.0, kosherType: "meat", kosherLabel: "בשרי", name: "ארוחת צהריים", protein: 41, desc: "130 גרם חזה עוף מפורק למזלג (חוטים) עסיסי במחבת + 3 כפות פירה דלורית או בטטה.", tip: "לאחר בישול חזה העוף, פרק אותו לשערות בעזרת שני מזלגות - המרקם הזה פשוט 'מחליק' בבטן בקלות מדהימה." },
-                    { offsetHours: 8.5, kosherType: "parve", kosherLabel: "פרווה", name: "ארוחת ביניים אחה\"צ", protein: 24, desc: "קופסת טונה קטנה מסוננת + חצי אבוקדו מועך + פרוסת לחם מלא אחת קלויה בטוסטר.", tip: "טונה במים היא מקור חלבון נקי לחלוטין. אם אתה משתמש בטונה בשמן, סחט אותה היטב." },
-                    { offsetHours: 11.0, kosherType: "parve", kosherLabel: "פרווה", name: "ארוחת ערב", protein: 7, desc: "מרק ירקות עשיר ומסונן (על בסיס גזר, קישוא וסלרי) בתוספת חצי כוס עדשים מבושלות היטב עד ריכוך.", tip: "העדשים נמסות בתוך המרק ומעניקות פתרון פחמימה מורכבת מצוינת וחלבון פרווה נקי." }
-                ]
+                q: "ברצונך ליישם פונקציה מורכבת שכתבת, אשר מקבלת שורה שלמה ומחזירה ערך מחושב, על כל שורות ה-DataFrame. באיזה מנגנון תשתמש?",
+                options: [
+                    "df.map()",
+                    "df.apply(func, axis=0)",
+                    "df.apply(func, axis=1)",
+                    "df.transform(func)"
+                ],
+                answer: 2,
+                rationale: "הפונקציה apply בשילוב axis=1 מעבירה אל הפונקציה שלך (func) שורה אחר שורה (כבסדרה), מה שמאפשר גישה לכל העמודות באותה שורה."
             },
             {
-                name: "תפריט ז' - חזה עוף צרוב וקינואה",
-                macros: { cal: 905, pro: 116, carb: 45, fat: 28 },
-                meals: [
-                    { offsetHours: 0.5, kosherType: "dairy", kosherLabel: "חלבי", name: "ארוחת בוקר", protein: 15, desc: "מקושקשת מ-2 ביצים עם כף בולגרית 5% מגוררת מעל + מלפפון קלוף.", tip: "הבולגרית מוסיפה מליחות נהדרת כך שאין צורך להוסיף מלח לחביתה." },
-                    { offsetHours: 3.0, kosherType: "dairy", kosherLabel: "חלבי", name: "ארוחת ביניים בוקר", protein: 20, desc: "גביע יוגורט פרו/גו 20 ג' חלבון.", tip: "שמור את היוגורט תמיד במקרר - אכילה שלו כשהוא קר מאוד עוזרת להרגיע את הקיבה." },
-                    { offsetHours: 6.0, kosherType: "meat", kosherLabel: "בשרי", name: "ארוחת צהריים", protein: 43, desc: "130 גרם חזה עוף פשוט וצרוב על מחבת פסים חמה + 3 כפות קינואה רכה מאוד.", tip: "כדי שהקינואה תהיה רכה וקלה לעיכול, בשל אותה כמו פסטה (בהרבה מים רותחים) וסנן בסיום." },
-                    { offsetHours: 8.5, kosherType: "parve", kosherLabel: "פרווה", name: "ארוחת ביניים אחה\"צ", protein: 29, desc: "ביצה קשה אחת מרוסקת + קופסת טונה קטנה מסוננת + פרוסת לחם מלא קלויה היטב.", tip: "שילוב של ביצה וטונה נותן פצצת חלבון נקייה, קלה להכנה ומאוד משביעה." },
-                    { offsetHours: 11.0, kosherType: "parve", kosherLabel: "פרווה", name: "ארוחת ערב", protein: 9, desc: "חצי כוס אדממה (פולי סויה) מאודים עם מעט מלח גס ולימון סחוט.", tip: "נשנוש מעולה מול הטלוויזיה, עשיר בסיבים תזונתיים רכים ובחלבון איכותי." }
-                ]
+                q: "קיבלת אזהרה: SettingWithCopyWarning בפנדס. מהי הסיבה הנפוצה ביותר לכך?",
+                options: [
+                    "ניסיון למחוק עמודה שלא קיימת.",
+                    "ניסיון לבצע השמה (שינוי ערך) על Slice (חיתוך) מתוך DataFrame, בלי שפנדס יודעת אם זה עותק או הפניה למקור.",
+                    "ניסיון לשלב שני DataFrames עם אינדקסים שונים.",
+                    "חוסר זיכרון (RAM) פנוי במחשב."
+                ],
+                answer: 1,
+                rationale: "כאשר כותבים משהו כמו df[df['A']>5]['B'] = 1, פנדס מזהירה אותך שהיא לא בטוחה אם שינית את ה-df המקורי או רק זכרון זמני. הפתרון הוא להשתמש ב-.loc."
             },
             {
-                name: "תפריט ח' - קדירת דייג ים תיכונית קלה",
-                macros: { cal: 936, pro: 101, carb: 51, fat: 37 },
-                meals: [
-                    { offsetHours: 0.5, kosherType: "dairy", kosherLabel: "חלבי", name: "ארוחת בוקר", protein: 15, desc: "2 ביצים מקושקשות עם כף בולגרית 5% מגוררת מעל + מלפפון קלוף.", tip: "טריפת הביצים היטב עם מזלג מכניסה אוויר לתערובת והופכת את המקושקשת לאוורירית וקלה לעיכול." },
-                    { offsetHours: 3.0, kosherType: "dairy", kosherLabel: "חלבי", name: "ארוחת ביניים בוקר", protein: 21, desc: "גביע יוגורט חלבון (וניל או קרמל) + 5 שקדים.", tip: "מעדני חלבון קרים מסייעים לתחושת רעננות ומספקים אנרגיה מהירה." },
-                    { offsetHours: 6.0, kosherType: "parve", kosherLabel: "פרווה", name: "ארוחת צהריים", protein: 29, desc: "130 גרם פילה דג לברק או דניס אפוי בתנור עם שום ולימון + 3 כפות פירה גזר ודלעת מתקתק.", tip: "הנח את הדג על נייר אפייה, שפוך עליו מעט מיץ לימון סחוט, מלח ואבקת שום, ואפה ב-200 מעלות רק 10 דקות." },
-                    { offsetHours: 8.5, kosherType: "parve", kosherLabel: "פרווה", name: "ארוחת ביניים אחה\"צ", protein: 23, desc: "סוגר רעב של אחר הצהריים: קופסת טונה קטנה + חצי אבוקדו מועך + 2 יחידות לחמית.", tip: "האבוקדו מחליף את המיונז ומספק שומנים בריאים (חד-בלתי-רוויים) שחיוניים למפרקים ולשרירים." },
-                    { offsetHours: 11.0, kosherType: "parve", kosherLabel: "פרווה", name: "ארוחת ערב", protein: 13, desc: "מרק עגבניות עשיר בתוספת נטיפי חלבוני ביצה (3 חלבונים מעורבבים פנימה תוך כדי בישול).", tip: "שיטה זו מעשירה את המרק בחלבון מלא בלי לשנות את המרקם החלק שלו." }
-                ]
+                q: "מה ההבדל בין pd.merge לבין pd.concat?",
+                options: [
+                    "merge מיועד לשורות, concat מיועד לעמודות.",
+                    "merge מחבר טבלאות לפי עמודות מפתח/אינדקס משותפות (כמו JOIN ב-SQL), בעוד concat רק 'מדביק' טבלאות אחת מתחת לשנייה או זו לצד זו פיזית.",
+                    "אין הבדל, אלו שמות נרדפים.",
+                    "concat יכול לחבר רק שתי טבלאות, merge יכול לחבר אינסוף טבלאות בבת אחת."
+                ],
+                answer: 1,
+                rationale: "merge הוא ה-'VLOOKUP' של פנדס, המבוסס על ערכים משותפים (למשל ת.ז). concat פשוט לוקח בלוק אחד ושם אותו מתחת או ליד בלוק אחר."
             },
             {
-                name: "תפריט ט' - חזה עוף אפוי ועסיסי",
-                macros: { cal: 1040, pro: 112, carb: 82, fat: 27 },
-                meals: [
-                    { offsetHours: 0.5, kosherType: "dairy", kosherLabel: "חלבי", name: "ארוחת בוקר", protein: 13, desc: "טוסט פתוח: פרוסת לחם מלא אחת עם 2 כפות קוטג' 5% ופרוסת גבינה צהובה 9% מומסת בטוסטר.", tip: "המסת הגבינה הצהובה הופכת את הלחם ליציב יותר ומונעת ממנו להפוך לעיסתי מדי בפה." },
-                    { offsetHours: 3.0, kosherType: "dairy", kosherLabel: "חלבי", name: "ארוחת ביניים בוקר", protein: 20, desc: "גביע מעדן חלבון פרו/גו לבחירתך.", tip: "השתמש במעדן החלבון כנשנוש ביניים מעולה לפני שהרעב האמיתי תוקף." },
-                    { offsetHours: 6.0, kosherType: "meat", kosherLabel: "בשרי", name: "ארוחת צהריים", protein: 41, desc: "130 גרם חזה עוף אפוי פשוט בתבנית מכוסה בנייר כסף + 3 כפות אורז בסמטי רך מאוד.", tip: "אפיית חזה העוף כשהוא מכוסה הרמטית בנייר כסף שומרת על האדים בפנים ומונעת ממנו להתייבש ולהיות קשה." },
-                    { offsetHours: 8.5, kosherType: "parve", kosherLabel: "פרווה", name: "ארוחת ביניים אחה\"צ", protein: 28, desc: "חביתה מביצה אחת + קופסת טונה קטנה מסוננת + 2 יחידות לחמית.", tip: "תכין את החביתה במחבת קטנה כדי שתצא עבה ורכה." },
-                    { offsetHours: 11.0, kosherType: "parve", kosherLabel: "פרווה", name: "ארוחת ערב", protein: 10, desc: "ממרח חומוס ביתי דליל וחם (חצי כוס גרגירים טחונים עם כף טחינה ומים) + קרקר קל אחד.", tip: "מרקם חם ונוזלי קל במיוחד לבליעה לפני השינה ומשרה שקט בבטן." }
-                ]
+                q: "בטבלת Pivot (טבלת ציר), אם נגדיר aggfunc=list, מה נקבל בתאי הטבלה?",
+                options: [
+                    "שגיאה, הפונקציה מקבלת רק פעולות מתמטיות כמו sum או mean.",
+                    "את מספר הערכים השונים שיש בכל תא.",
+                    "רשימה של ממש (List בפייתון) המכילה את כל הערכים הגולמיים שנפלו לאותו חיתוך.",
+                    "את הערך המקסימלי מתוך הרשימה."
+                ],
+                answer: 2,
+                rationale: "פנדס גמישה מאוד. ניתן להעביר כל פונקציה אגרגטיבית. aggfunc=list יאגור את כל התצפיות הרלוונטיות לתא לתוך מבנה נתונים של רשימה."
+            },
+
+            // --- Neural Networks Deep Dive ---
+            {
+                q: "ברשת נוירונים מסוג סיווג מרובה-מחלקות (Multi-class, למשל זיהוי ספרות 0-9), איזו פונקציית אקטיבציה תהיה בשכבת הפלט?",
+                options: [
+                    "Sigmoid",
+                    "ReLU",
+                    "Softmax",
+                    "Tanh"
+                ],
+                answer: 2,
+                rationale: "Softmax מוציאה וקטור של הסתברויות שסכומן הוא 1, מה שהופך אותה למושלמת לסיווג שבו כל פריט שייך למחלקה אחת בלבד מתוך כמה."
             },
             {
-                name: "תפריט י' - קציצות עוף קלות ונימוחות",
-                macros: { cal: 1125, pro: 107, carb: 55, fat: 55 },
-                meals: [
-                    { offsetHours: 0.5, kosherType: "dairy", kosherLabel: "חלבי", name: "ארוחת בוקר", protein: 24, desc: "גביע יוגורט GO/PRO מועשר בחלבון + כף חמאת בוטנים טבעית מעורבבת היטב.", tip: "חמאת בוטנים טבעית ללא תוספת סוכר היא מקור מצוין לשומנים בריאים ולחלבון." },
-                    { offsetHours: 3.0, kosherType: "dairy", kosherLabel: "חלבי", name: "ארוחת ביניים בוקר", protein: 16, desc: "2 ביצים קשות + 2 כפות גבינה לבנה 5%.", tip: "פזר מעט מלח הימלאיה או פלפל שחור גרוס על הביצים הקשות לשדרוג מהיר של הטעם." },
-                    { offsetHours: 6.0, kosherType: "meat", kosherLabel: "בשרי", name: "ארוחת צהריים", protein: 34, desc: "4 קציצות עוף טחון רכות במיוחד המבושלות במים או במעט רוטב צהוב + 3 כפות פירה בטטה.", tip: "כשמכינים קציצות עוף, הוסף קצת מים לתערובת הבשר לפני הטיגון/בישול כדי להבטיח שהן יישארו סופר רכות." },
-                    { offsetHours: 8.5, kosherType: "parve", kosherLabel: "פרווה", name: "ארוחת ביניים אחה\"צ", protein: 24, desc: "קופסת טונה קטנה מסוננת + חצי אבוקדו בינוני מועך + פרוסת לחם מלא קלויה.", tip: "ערבב פנימה כמה טיפות של שמן זית איכותי ומלח ליצירת מרקם ממרח עשיר." },
-                    { offsetHours: 11.0, kosherType: "parve", kosherLabel: "פרווה", name: "ארוחת ערב", protein: 9, desc: "רבע כוס זרעי דלעת קלופים ולא מומלחים קלות.", tip: "זרעי דלעת עשירים באבץ ובחלבון צמחי, מצוינים לתמיכה במערכת החיסון ובמפרקים." }
-                ]
+                q: "מהי בעיית 'הגרדיאנט הנעלם' (Vanishing Gradient) ברשתות עמוקות?",
+                options: [
+                    "מצב שבו מחיקת נתונים פוגעת במודל.",
+                    "כאשר משתמשים בפונקציות כמו Sigmoid, הנגזרות בשכבות העמוקות נהיות קרובות לאפס, המשקולות בקושי מתעדכנות, והרשת מפסיקה ללמוד.",
+                    "שגיאה של מחסור בזיכרון ב-GPU.",
+                    "כאשר פונקציית ה-Loss מגיעה לאפס מוקדם מדי (Overfitting)."
+                ],
+                answer: 1,
+                rationale: "בגלל שרשרת הגוזרות (Chain Rule) ב-Backprop, הכפלה של הרבה מספרים קטנים מ-1 מאפסת את השגיאה ככל שהיא הולכת אחורה. הפתרון הנפוץ: שימוש ב-ReLU."
             },
             {
-                name: "תפריט יא' - טופו מוקפץ אסייתי עדין",
-                macros: { cal: 1075, pro: 107, carb: 58, fat: 47 },
-                meals: [
-                    { offsetHours: 0.5, kosherType: "dairy", kosherLabel: "חלבי", name: "ארוחת בוקר", protein: 18, desc: "2 ביצים מקושקשות עם כף אחת גבינת מוצרלה 5% מגוררת מומסת בפנים.", tip: "המוצרלה המומסת קושרת את הביצים והופכת אותן למרקם גמיש וקטיפתי שאינו יבש כלל." },
-                    { offsetHours: 3.0, kosherType: "dairy", kosherLabel: "חלבי", name: "ארוחת ביניים בוקר", protein: 20, desc: "גביע יוגורט חלבון GO/PRO בטעם טבעי או פירות יער.", tip: "מנות יוגורט מוכנות הן פתרון מדהים לאכילה נוחה מחוץ לבית כשאתה בלימודים או בסידורים." },
-                    { offsetHours: 6.0, kosherType: "parve", kosherLabel: "פרווה", name: "ארוחת צהריים", protein: 22, desc: "200 גרם קוביות טופו יציב מוקפצות במחבת עם כף שמן שומשום ורוטב סויה דל נתרן + כוס פרחי ברוקולי מאודים ורכים מאוד.", tip: "השרה את הטופו ברוטב סויה 10 דקות לפני ההקפצה כדי שיספוג את כל הטעם לתוכו." },
-                    { offsetHours: 8.5, kosherType: "dairy", kosherLabel: "חלבי", name: "ארוחת ביניים אחה\"צ", protein: 24, desc: "יוגורט GO/PRO חלבון לבן פשוט עם כפית אחת קטנה חמאת שקדים טבעית.", tip: "חמאת שקדים משתלבת נהדר ביוגורט ומעניקה לו מתיקות מעודנת של מרציפן." },
-                    { offsetHours: 11.0, kosherType: "parve", kosherLabel: "פרווה", name: "ארוחת ערב", protein: 23, desc: "שקשוקת טונה מהירה: ביצה אחת מבושלת היטב ברוטב עגבניות יחד עם חצי קופסת טונה מעורבבת בתוך הרוטב.", tip: "הטונה סופגת את מיצי העגבניות והופכת לרכה וטעימה במיוחד בליווי חצי פרוסת לחם מלא קלוי." }
-                ]
+                q: "למה משמשת שכבת Dropout בזמן אימון רשת נוירונים?",
+                options: [
+                    "למחיקת תמונות לא ברורות מסט האימון.",
+                    "להפחתת ממדיות כמו PCA.",
+                    "למניעת Overfitting על ידי 'כיבוי' אקראי של אחוז מסוים מהנוירונים בכל סבב, מה שמכריח את הרשת להיות יתירה ולא להסתמך על נוירון בודד.",
+                    "לסיום אוטומטי של תהליך האימון (Early Stopping)."
+                ],
+                answer: 2,
+                rationale: "Dropout היא שיטת רגולריזציה גאונית. על ידי השבתה אקראית, הרשת לא יכולה 'לשנן' קשרים ספציפיים וחייבת ללמוד ייצוגים חזקים ומוכללים יותר."
             },
             {
-                name: "תפריט יב' - דג אמנון ופירה בטטה קטיפתי",
-                macros: { cal: 920, pro: 106, carb: 48, fat: 35 },
-                meals: [
-                    { offsetHours: 0.5, kosherType: "dairy", kosherLabel: "חלבי", name: "ארוחת בוקר", protein: 34, desc: "שייק חלבון: כוס חלב 3% מועשר + כף מדידה אחת של אבקת חלבון מי גבינה + חצי בננה קטנה.", tip: "שתיית שייק חלבון בבוקר היא הדרך הקלה והמהירה ביותר להתחיל את היום עם כמות חלבון עצומה בלי להעמיס נפח על הקיבה." },
-                    { offsetHours: 3.0, kosherType: "dairy", kosherLabel: "חלבי", name: "ארוחת ביניים בוקר", protein: 15, desc: "חצי גביע קוטג' 5% עם רצועות דקות של מלפפון ללא קליפה.", tip: "הקוטג' מכיל חלבון קזאין שמתעכל לאט ומזין את השרירים לאורך מספר שעות." },
-                    { offsetHours: 6.0, kosherType: "parve", kosherLabel: "פרווה", name: "ארוחת צהריים", protein: 25, desc: "120 גרם פילה אמנון (מושט) אפוי בתנור עם שמן זית, פפריקה ומלח + 3 כפות פירה בטטה רך.", tip: "פזר מעט כמון על הדג לפני האפייה כדי להעניק לו ארומה מזרח תיכונית משגעת." },
-                    { offsetHours: 8.5, kosherType: "dairy", kosherLabel: "חלבי", name: "ארוחת ביניים אחה\"צ", protein: 12, desc: "2 פרוסות גבינה צהובה 9% מגולגלות סביב מקל מלפפון קלוף.", tip: "חטיף חלבון מהיר ונוח לביצוע ללא בישול כלל." },
-                    { offsetHours: 11.0, kosherType: "parve", kosherLabel: "פרווה", name: "ארוחת ערב", protein: 20, desc: "קופסת טונה קטנה מסוננת מעורבבת עם רבע אבוקדו מועך ומעט בצל ירוק קצוץ דק.", tip: "הבצל הירוק נותן בעיטה מעולה של טעם רענן לטונה הפשוטה." }
-                ]
+                q: "אם למערך הנתונים שלנו יש 1000 דגימות, והגדרנו Batch Size של 100, כמה עדכוני משקולות (Iterations) יתבצעו בכל Epoch (סבב אימון)?",
+                options: [
+                    "1000",
+                    "10",
+                    "1",
+                    "100"
+                ],
+                answer: 1,
+                rationale: "Epoch אחד הוא מעבר על כל הנתונים. אם מעבירים 100 דגימות בכל פעימה (Batch), ייקח 10 פעימות (1000/100) להשלים Epoch אחד. בכל פעימה המשקולות מתעדכנות."
+            },
+            {
+                q: "מדוע משתמשים באלגוריתם האופטימיזציה Adam במקום ב-Stochastic Gradient Descent (SGD) הפשוט?",
+                options: [
+                    "Adam לא דורש פונקציית Loss.",
+                    "Adam הוא מהיר יותר חישובית על מעבדים פשוטים.",
+                    "Adam משלב 'מומנטום' (היסטוריית הצעדים) ומתאים את קצב הלמידה אישית לכל פרמטר, מה שמוביל להתכנסות מהירה ויציבה יותר.",
+                    "SGD לא חוקי בשימוש לבעיות סיווג."
+                ],
+                answer: 2,
+                rationale: "SGD עלול להיתקע במינימום מקומי ולהיות איטי. Adam משכלל אותו על ידי שילוב מומנטום והסתגלות לקצב השינוי של כל משקולת בנפרד."
+            },
+
+            // --- Trees, Random Forest & XGBoost ---
+            {
+                q: "בעץ החלטה (Decision Tree), מה משמעות המושג 'Information Gain' (רווח מידע)?",
+                options: [
+                    "כמות הזיכרון שהמודל חוסך.",
+                    "ההפרש בין אי-הטוהר (למשל Gini/Entropy) של צומת האב לבין הממוצע המשוקלל של אי-הטוהר של צמתי הבנים. פיצול אופטימלי ממקסם את זה.",
+                    "מספר העמודות החדשות שהמודל יצר.",
+                    "מדד שמראה כמה המודל מדויק על נתוני המבחן."
+                ],
+                answer: 1,
+                rationale: "Information Gain הוא בעצם 'כמה סדר עשינו עכשיו'. אם צומת האב היה מבולגן מאוד (ג'יני גבוה), והפיצול יצר ילדים טהורים (ג'יני נמוך), יש לנו רווח מידע גדול!"
+            },
+            {
+                q: "מה קורה כאשר מגדירים Parameter שנקרא learning_rate (או eta) נמוך מאוד ב-XGBoost?",
+                options: [
+                    "המודל יאומן מהר יותר.",
+                    "כל עץ חדש יוסיף רק שבריר מהתיקון שלו לתחזית הכללית. נצטרך הרבה יותר עצים כדי להגיע לביצועים טובים, אך לרוב נמנע Overfitting.",
+                    "המודל יהפוך ליער אקראי.",
+                    "יעילות המודל לא תשתנה, רק הזמן."
+                ],
+                answer: 1,
+                rationale: "קצב למידה נמוך (Shrinkage) אומר שאנחנו לא סומכים ב-100% על התיקון של עץ אחד. זה הופך את תהליך הלמידה לשמרני ואיטי יותר, אך לרוב מניב תוצאה חזקה ומוכללת יותר."
+            },
+            {
+                q: "ביער אקראי (Random Forest), מהו המושג 'Out-of-Bag (OOB) Error'?",
+                options: [
+                    "שגיאה הנגרמת מנתונים חסרים.",
+                    "שגיאת הסינון של תצפיות מחוץ לטווח.",
+                    "דרך להעריך את דיוק המודל ללא סט בדיקה (Test Set): כל עץ נבחן על שליש מהנתונים שהוא *לא* ראה במהלך הדגימה האקראית שלו (ה-Bootstrap).",
+                    "כשל בייצוא המודל לקובץ."
+                ],
+                answer: 2,
+                rationale: "כיוון שכל עץ נבנה על מדגם של כ-63% מהנתונים (בגלל חזרות), ה-37% הנותרים (OOB) יכולים לשמש כקבוצת Validation חינמית ואינהרנטית למודל."
+            },
+            {
+                q: "מדוע מודלים מבוססי עצים (Trees) אינם מתאימים מטבעם לאקסטרפולציה (Extrapolation - חיזוי ערכים מחוץ לטווח נתוני האימון)?",
+                options: [
+                    "כי הם לא תומכים ברגרסיה.",
+                    "כי הם מבוססים על מרחק אוקלידי.",
+                    "כי העץ רק מפצל את המרחב הקיים לאזורים. אם תוזן תצפית גדולה משמעותית מכל מה שראה, היא פשוט תיפול לעלה האחרון ותקבל את הממוצע שלו.",
+                    "כי צריך לעשות להם Scaling לפני כן."
+                ],
+                answer: 2,
+                rationale: "רגרסיה לינארית תמתח קו לאינסוף (ותחזה מחיר עצום לבית של 1000 מ'ר). יער אקראי פשוט יחזה את המחיר של הבית הכי גדול שהוא ראה באימון, כי אין לו כלל מעבר לזה."
+            },
+            {
+                q: "ב-XGBoost, כיצד האלגוריתם מתמודד עם ערכים חסרים מובנים (NaN) ללא Imputation (מילוי) מוקדם?",
+                options: [
+                    "הוא קורס וזורק שגיאה.",
+                    "הוא ממלא אותם אוטומטית ב-0.",
+                    "הוא לומד מהנתונים 'כיוון ברירת מחדל'. בכל פיצול הוא בודק האם שליחת החסרים שמאלה או ימינה משפרת את ה-Loss, ושומר החלטה זו.",
+                    "הוא מוחק את כל השורות שמכילות NaN."
+                ],
+                answer: 2,
+                rationale: "זהו אחד מכוחות העל של XGBoost (Sparsity-aware Split Finding). במקום שננחש איך למלא, האלגוריתם לומד אמפירית מה לעשות עם חסרים כדי למקסם דיוק."
+            },
+
+            // --- Clustering & Unsupervised ---
+            {
+                q: "מה קורה ב-K-Means אם נאתחל בטעות את שתי נקודות המרכז (Centroids) באותו מיקום פיזי בדיוק?",
+                options: [
+                    "האלגוריתם יתקן זאת אוטומטית באיטרציה הבאה.",
+                    "הם יתפצלו כעבור לולאה אחת.",
+                    "האלגוריתם עלול להיתקע במצב שבו שניהם מתעדכנים לאותו מיקום לנצח, או שאחד מהם יישאר ריק מנקודות (בהתאם למימוש הספציפי).",
+                    "הם יהפכו לאשכול אחד גדול, וה-K ירד ל-1."
+                ],
+                answer: 2,
+                rationale: "K-Means תלוי לחלוטין באתחול. אם שני מרכזים חופפים, המרחק אליהם זהה, מה ששובר את סימטריית החלוקה. (זו סיבה לשימוש באלגוריתם K-Means++ לאתחול חכם)."
+            },
+            {
+                q: "באלגוריתם Clustering היררכי (Hierarchical), מה קובעת שיטת הקישור (Linkage Criterion), למשל Ward לעומת Single?",
+                options: [
+                    "את הצבע של הדנדרוגרמה.",
+                    "האם המודל הוא supervised או unsupervised.",
+                    "כיצד מחשבים את המרחק בין *שני אשכולות*. (למשל Single=מרחק בין הנקודות הכי קרובות, Ward=מזעור השונות).",
+                    "את מספר ה-K הסופי."
+                ],
+                answer: 2,
+                rationale: "כשיש לנו שני אשכולות עם עשרות נקודות בכל אחד, איך מחליטים כמה הם רחוקים? ה-Linkage מגדיר את החוקיות הזו ומשפיע דרמטית על צורת האשכולות."
+            },
+            {
+                q: "האלגוריתם DBSCAN דורש שני פרמטרים עיקריים: Epsilon ו-MinPts. מה תפקידם?",
+                options: [
+                    "Epsilon זה מספר האשכולות, MinPts זה כמות הנקודות.",
+                    "Epsilon הוא רדיוס החיפוש סביב נקודה, ו-MinPts הוא מספר הנקודות המינימלי שחייב להיות ברדיוס הזה כדי שהנקודה תיחשב לנקודת ליבה (Core Point).",
+                    "Epsilon מגדיר את אחוז החריגים המותר, MinPts את העומק.",
+                    "הם קובעים את גודל הרשת העצבית הפנימית של האלגוריתם."
+                ],
+                answer: 1,
+                rationale: "אלו חוקי הצפיפות. 'אם יש לי לפחות MinPts חברים במרחק של עד Epsilon ממני, אני אזור צפוף וזכאי להיות אשכול'."
+            },
+
+            // --- Mix & Edge Cases ---
+            {
+                q: "איזה מן הבאים מהווה דוגמה קלאסית של Target Leakage (זליגת מטרה)?",
+                options: [
+                    "שכחת לעשות Drop לעמודת שנת הלידה כשיש עמודת גיל.",
+                    "במודל לחיזוי אישור הלוואה, השארת בטבלה עמודה של 'מספר חודשי איחור בתשלום ההלוואה הנוכחית' (נתון שנוצר רק לאחר האישור).",
+                    "השתמשת באותו Seed ל-random_state פעמיים.",
+                    "השתמשת ב-Accuracy במקום ב-F1."
+                ],
+                answer: 1,
+                rationale: "Leakage קורה כשאתה נותן למודל באימון מידע שלא יהיה קיים ברגע החיזוי האמיתי. ברגע הגשת הבקשה להלוואה, אין היסטוריית איחורים לאותה הלוואה."
+            },
+            {
+                q: "מה קורה כשאנחנו משתמשים בפונקציה pd.cut() ב-Pandas?",
+                options: [
+                    "היא מוחקת את החלק העליון של ה-DataFrame.",
+                    "היא חותכת מחרוזות ארוכות.",
+                    "היא ממירה משתנה מספרי רציף לקטגוריות (Bins/מרווחים) לפי גבולות מוגדרים (למשל: 'ילד', 'מבוגר', 'זקן').",
+                    "היא מבצעת חיסור מתמטי בין עמודות."
+                ],
+                answer: 2,
+                rationale: "Discretization (או Binning) הוא תהליך נפוץ. pd.cut מחלקת ציר רציף למקטעים. (לעומתה, pd.qcut מחלקת למקטעים בעלי כמות נתונים שווה - Quantiles)."
+            },
+            {
+                q: "הבנת שהמודל שלך סובל מ-High Bias (הטיה גבוהה) ו-Low Variance. מה זה אומר ואיך תתקן?",
+                options: [
+                    "זה אומר Overfitting. נתקן על ידי הקטנת עומק העץ.",
+                    "זה אומר שזלגו נתונים. נתקן על ידי ניקוי.",
+                    "זה אומר Underfitting (המודל פשוט מדי מכדי ללמוד את התבנית). נתקן על ידי שימוש במודל מורכב יותר (למשל עץ עמוק יותר, או הוספת מאפיינים).",
+                    "זה אומר שיש יותר מדי רעש. ננקה Outliers."
+                ],
+                answer: 2,
+                rationale: "Bias גבוה פירושו שהמודל לא גמיש מספיק ומניח הנחות פשוטות מדי (כמו קו ישר לנתונים עגולים). הפתרון הוא הגדלת מורכבות המודל."
+            },
+            {
+                q: "מה המטרה של רגולריזציה (Regularization) כגון L1 (Lasso) או L2 (Ridge) במודלים לינאריים?",
+                options: [
+                    "להגדיל את ה-Loss ככל האפשר.",
+                    "לאלץ את המודל לבחור בפרמטרים אקראיים.",
+                    "להוסיף 'קנס' מתמטי (Penalty) על משקולות גדולות במודל. המטרה היא לפשט את המודל ולמנוע Overfitting.",
+                    "לתקן אוטומטית שגיאות כתיב בנתונים."
+                ],
+                answer: 2,
+                rationale: "כשהמודל משתגע ומקצה משקולות של אלפים למשתנים לא קשורים רק כדי 'לפגוע בול' בנתוני האימון, הרגולריזציה קונסת אותו ומרסנת את המשקולות."
+            },
+            {
+                q: "בפייתון, מה יקרה בקוד הבא? `except (TypeError, ValueError) as e:`",
+                options: [
+                    "שגיאת תחביר (SyntaxError).",
+                    "בלוק ה-except ירוץ רק אם יתרחשו גם TypeError וגם ValueError בו זמנית.",
+                    "התוכנית תעצור ותזרוק את e.",
+                    "בלוק ה-except יתפוס ויטפל בשגיאה בין אם היא מסוג TypeError או מסוג ValueError (תפיסה מרובה)."
+                ],
+                answer: 3,
+                rationale: "ניתן לתפוס מספר סוגי שגיאות באותו בלוק except על ידי עטיפתן ב-Tuple (סוגריים עגולים). e הוא המשתנה שיכיל את פרטי השגיאה."
+            },
+            {
+                q: "למה משמשת הפקודה `df.set_index('Column_Name')`?",
+                options: [
+                    "מוחקת את האינדקס הקיים לחלוטין.",
+                    "מגדירה עמודה קיימת בטבלה כאינדקס (שמות השורות) החדש של ה-DataFrame.",
+                    "ממיינת את הטבלה לפי העמודה.",
+                    "יוצרת אינדקסים חדשים של 0,1,2 לטבלה."
+                ],
+                answer: 1,
+                rationale: "כאשר יש לנו עמודה טבעית כמו תעודת זהות או תאריך, הגדרתה כאינדקס מאפשרת שליפה סופר-מהירה באמצעות loc[]."
+            },
+            {
+                q: "בבניית מודל מזהה תמרורים, המודל למד שכל תמרורי ה'עצור' נמצאים ביום שטוף שמש, וכל תמרורי ה'תן זכות קדימה' בחושך. הוא למד לזהות תאורה ולא תמרור. איך קוראים לתופעה?",
+                options: [
+                    "Data Imbalance",
+                    "Curse of Dimensionality",
+                    "Covariate Shift / Spurious Correlation (קשר מדומה / מתאם סרק)",
+                    "Underfitting"
+                ],
+                answer: 2,
+                rationale: "המודל הוא 'עצלן'. אם הוא מוצא קיצור דרך (רקע התמונה במקום העצם עצמו), הוא ישתמש בו. לכן חשוב שמערך האימון ייצג מגוון מצבים כדי למנוע קשרים מדומים."
             }
         ];
 
-        let timerInterval = null;
-        let timerSeconds = 30 * 60; // 30 minutes in seconds
-        let timerRunning = false;
-        let currentActiveMenuIndex = -1;
-        let selectedMealsState = {}; // Keeps track of checked meals for the current menu
-        let globalWakeUpTime = "08:00"; // Default wake-up time
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let isAnswerChecked = false;
+        let selectedOption = null;
 
-        function toggleWaterTimer() {
-            const btn = document.getElementById('startTimerBtn');
-            const display = document.getElementById('timerDisplay');
+        // DOM Elements
+        const startScreen = document.getElementById('start-screen');
+        const quizScreen = document.getElementById('quiz-screen');
+        const resultScreen = document.getElementById('result-screen');
+        const questionText = document.getElementById('question-text');
+        const optionsContainer = document.getElementById('options-container');
+        const progressBar = document.getElementById('progress-bar');
+        const scoreDisplay = document.getElementById('score-display');
+        const currentQNum = document.getElementById('current-q-num');
+        const feedbackArea = document.getElementById('feedback-area');
+        const feedbackTitle = document.getElementById('feedback-title');
+        const feedbackRationale = document.getElementById('feedback-rationale');
+        const feedbackIcon = document.getElementById('feedback-icon');
+
+        function startQuiz() {
+            startScreen.classList.add('hidden');
+            quizScreen.classList.remove('hidden');
+            quizScreen.classList.add('flex');
+            // Shuffle questions (optional, currently linear)
+            // questions.sort(() => Math.random() - 0.5); 
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            isAnswerChecked = false;
+            selectedOption = null;
+            const q = questions[currentQuestionIndex];
             
-            if (timerRunning) {
-                // Stop timer
-                clearInterval(timerInterval);
-                timerRunning = false;
-                timerSeconds = 30 * 60;
-                btn.innerHTML = `<i data-lucide="timer" class="w-3.5 h-3.5"></i><span>הפעל</span>`;
-                display.innerText = "הפעל טיימר של 30 דקות בסיום הביס";
-                display.className = "text-xs text-stone-500";
-                lucide.createIcons();
-            } else {
-                // Start timer
-                timerRunning = true;
-                btn.innerHTML = `<i data-lucide="circle-stop" class="w-3.5 h-3.5"></i><span>עצור</span>`;
-                btn.classList.add('bg-red-600', 'hover:bg-red-700');
-                btn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
-                lucide.createIcons();
-                
-                timerInterval = setInterval(() => {
-                    timerSeconds--;
-                    let mins = Math.floor(timerSeconds / 60);
-                    let secs = timerSeconds % 60;
-                    display.innerText = `מותר לשתות בעוד: ${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')} דקות`;
-                    display.className = "text-xs text-blue-600 font-bold animate-pulse";
-                    
-                    if (timerSeconds <= 0) {
-                        clearInterval(timerInterval);
-                        display.innerText = "מעולה! מותר לך לשתות כעת! 💧";
-                        display.className = "text-xs text-emerald-600 font-extrabold";
-                        btn.innerHTML = `<i data-lucide="check" class="w-3.5 h-3.5"></i><span>הושלם</span>`;
-                        btn.classList.remove('bg-red-600', 'hover:bg-red-700');
-                        btn.classList.add('bg-emerald-600');
-                        lucide.createIcons();
-                    }
-                }, 1000);
-            }
-        }
-
-        function updateWakeUpTime(timeVal) {
-            globalWakeUpTime = timeVal;
-            if (currentActiveMenuIndex !== -1) {
-                renderMenu(currentActiveMenuIndex);
-            }
-        }
-
-        function setToNowTime() {
-            const now = new Date();
-            const hours = now.getHours().toString().padStart(2, '0');
-            const minutes = now.getMinutes().toString().padStart(2, '0');
-            const timeStr = `${hours}:${minutes}`;
-            document.getElementById('wakeUpTimeInput').value = timeStr;
-            updateWakeUpTime(timeStr);
-        }
-
-        function calculateMealTime(wakeTimeStr, offsetHours) {
-            const [wHours, wMinutes] = wakeTimeStr.split(':').map(Number);
-            const wakeDate = new Date();
-            wakeDate.setHours(wHours, wMinutes, 0, 0);
+            // Update UI
+            questionText.textContent = q.q;
+            currentQNum.textContent = currentQuestionIndex + 1;
+            progressBar.style.width = `${((currentQuestionIndex) / questions.length) * 100}%`;
             
-            // Add offset hours
-            const offsetMs = offsetHours * 60 * 60 * 1000;
-            const mealDate = new Date(wakeDate.getTime() + offsetMs);
-            
-            const hours = mealDate.getHours().toString().padStart(2, '0');
-            const minutes = mealDate.getMinutes().toString().padStart(2, '0');
-            return `${hours}:${minutes}`;
-        }
+            // Clear previous
+            optionsContainer.innerHTML = '';
+            feedbackArea.classList.add('hidden');
+            feedbackArea.classList.remove('bg-green-500/10', 'border-green-500/30', 'bg-red-500/10', 'border-red-500/30');
+            feedbackIcon.className = 'text-2xl ml-3';
 
-        window.onload = function() {
-            const selectEl = document.getElementById('directMenuSelect');
-            menus.forEach((m, idx) => {
-                const opt = document.createElement('option');
-                opt.value = idx;
-                opt.innerText = m.name;
-                selectEl.appendChild(opt);
+            // Render options
+            q.options.forEach((opt, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn w-full text-right p-4 rounded-xl text-lg font-medium focus:outline-none flex justify-between items-center group';
+                btn.innerHTML = `
+                    <span class="ml-4" style="direction: rtl">${opt}</span>
+                    <div class="w-6 h-6 rounded-full border border-white/30 flex-shrink-0 flex items-center justify-center group-hover:border-cyan-400 transition-colors"></div>
+                `;
+                btn.onclick = () => checkAnswer(index, btn);
+                optionsContainer.appendChild(btn);
             });
-            
-            // Generate icons
-            lucide.createIcons();
         }
 
-        function updateProteinTracker() {
-            const menu = menus[currentActiveMenuIndex];
-            if (!menu) return;
+        function checkAnswer(selectedIndex, selectedBtn) {
+            if (isAnswerChecked) return;
+            isAnswerChecked = true;
+            selectedOption = selectedIndex;
 
-            let totalTarget = menu.macros.pro;
-            let consumed = 0;
+            const q = questions[currentQuestionIndex];
+            const isCorrect = selectedIndex === q.answer;
+            const allBtns = optionsContainer.children;
 
-            menu.meals.forEach((meal, idx) => {
-                const key = `${currentActiveMenuIndex}_${idx}`;
-                if (selectedMealsState[key]) {
-                    consumed += meal.protein;
+            // Style buttons
+            for(let i=0; i < allBtns.length; i++) {
+                allBtns[i].disabled = true;
+                const circle = allBtns[i].querySelector('div');
+                
+                if(i === q.answer) {
+                    allBtns[i].classList.add('correct');
+                    circle.innerHTML = '<i class="fa-solid fa-check text-xs"></i>';
+                    circle.className = "w-6 h-6 rounded-full bg-green-500 text-white flex-shrink-0 flex items-center justify-center border-none shadow-[0_0_10px_rgba(16,185,129,0.8)]";
+                } else if(i === selectedIndex && !isCorrect) {
+                    allBtns[i].classList.add('incorrect');
+                    circle.innerHTML = '<i class="fa-solid fa-xmark text-xs"></i>';
+                    circle.className = "w-6 h-6 rounded-full bg-red-500 text-white flex-shrink-0 flex items-center justify-center border-none";
+                } else {
+                    allBtns[i].classList.add('opacity-50');
                 }
-            });
+            }
 
-            // Update stats text
-            document.getElementById('trackerStats').innerText = `נצרך: ${consumed} גרם מתוך ${totalTarget} גרם חלבון`;
+            // Feedback Logic
+            feedbackArea.classList.remove('hidden');
             
-            // Update visual progress bar width
-            const percentage = Math.min((consumed / totalTarget) * 100, 100);
-            document.getElementById('trackerProgressBar').style.width = percentage + '%';
-        }
-
-        function toggleMealCheck(mealIdx, protein) {
-            const key = `${currentActiveMenuIndex}_${mealIdx}`;
-            const checkbox = document.getElementById(`chk_${mealIdx}`);
-            const mealCard = document.getElementById(`mealCard_${mealIdx}`);
-            
-            if (checkbox.checked) {
-                selectedMealsState[key] = true;
-                mealCard.classList.add('bg-emerald-50/40', 'border-emerald-200');
-                mealCard.classList.remove('border-stone-100');
+            if(isCorrect) {
+                score++;
+                scoreDisplay.textContent = score;
+                feedbackArea.classList.add('bg-green-500/10', 'border-green-500/30');
+                feedbackTitle.textContent = "בול פגיעה!";
+                feedbackTitle.className = "text-xl font-bold text-green-400";
+                feedbackIcon.classList.add('fa-solid', 'fa-circle-check', 'text-green-400');
             } else {
-                selectedMealsState[key] = false;
-                mealCard.classList.remove('bg-emerald-50/40', 'border-emerald-200');
-                mealCard.classList.add('border-stone-100');
+                feedbackArea.classList.add('bg-red-500/10', 'border-red-500/30');
+                feedbackTitle.textContent = "לא מדויק...";
+                feedbackTitle.className = "text-xl font-bold text-red-400";
+                feedbackIcon.classList.add('fa-solid', 'fa-circle-xmark', 'text-red-400');
             }
 
-            updateProteinTracker();
-        }
-
-        function renderMenu(menuIndex) {
-            currentActiveMenuIndex = menuIndex;
-            const menu = menus[menuIndex];
-            const outputCont = document.getElementById('outputContainer');
+            feedbackRationale.innerHTML = `<span class="font-bold text-white">הסבר: </span>${q.rationale}`;
             
-            // Fade-in animation helper
-            outputCont.classList.remove('hidden');
-            outputCont.classList.add('opacity-0', 'scale-95');
-            
-            setTimeout(() => {
-                document.getElementById('menuName').innerText = menu.name;
-                
-                // Set Macros in visual header
-                document.getElementById('cal').innerText = menu.macros.cal;
-                document.getElementById('pro').innerText = menu.macros.pro + 'g';
-                document.getElementById('carb').innerText = menu.macros.carb + 'g';
-                document.getElementById('fat').innerText = menu.macros.fat + 'g';
-
-                // Update Visual Macro Bars (Scale from 0 to 100%)
-                document.getElementById('calBar').style.width = Math.min((menu.macros.cal / 1200) * 100, 100) + '%';
-                document.getElementById('proBar').style.width = Math.min((menu.macros.pro / 120) * 100, 100) + '%';
-                document.getElementById('carbBar').style.width = Math.min((menu.macros.carb / 100) * 100, 100) + '%';
-                document.getElementById('fatBar').style.width = Math.min((menu.macros.fat / 60) * 100, 100) + '%';
-
-                // Reset tracker UI for this menu
-                updateProteinTracker();
-
-                // Build Meals List
-                const mealsContainer = document.getElementById('mealsContainer');
-                mealsContainer.innerHTML = '';
-
-                menu.meals.forEach((meal, idx) => {
-                    const kosherStyles = {
-                        dairy: { bg: 'bg-blue-50', text: 'text-blue-700', border: 'border-blue-200' },
-                        meat: { bg: 'bg-red-50', text: 'text-red-700', border: 'border-red-200' },
-                        parve: { bg: 'bg-emerald-50', text: 'text-emerald-700', border: 'border-emerald-200' }
-                    };
-                    const styling = kosherStyles[meal.kosherType] || kosherStyles.parve;
-                    const calculatedTime = calculateMealTime(globalWakeUpTime, meal.offsetHours);
-                    const key = `${menuIndex}_${idx}`;
-                    const isChecked = selectedMealsState[key] ? 'checked' : '';
-                    const highlightClass = isChecked ? 'bg-emerald-50/40 border-emerald-200' : 'border-stone-100';
-
-                    const mealDiv = document.createElement('div');
-                    mealDiv.id = `mealCard_${idx}`;
-                    mealDiv.className = `relative pr-2 p-3 rounded-2xl border transition duration-150 ${highlightClass}`;
-                    mealDiv.innerHTML = `
-                        <!-- Timeline circle dot -->
-                        <div class="absolute right-[-27px] top-4 w-3 h-3 rounded-full bg-brand-500 border-2 border-white shadow-sm"></div>
-                        
-                        <div class="flex items-start gap-3">
-                            <!-- Custom Checklist Checkbox -->
-                            <div class="flex items-center h-5 mt-1">
-                                <input id="chk_${idx}" type="checkbox" ${isChecked} onchange="toggleMealCheck(${idx}, ${meal.protein})" class="w-5 h-5 text-emerald-600 bg-stone-100 border-stone-300 rounded focus:ring-emerald-500 cursor-pointer">
-                            </div>
-                            
-                            <div class="flex-1">
-                                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-1">
-                                    <div class="flex items-center gap-2">
-                                        <span class="px-2 py-0.5 text-[10px] font-extrabold rounded-md ${styling.bg} ${styling.text} border ${styling.border}">
-                                            ${meal.kosherLabel}
-                                        </span>
-                                        <span class="text-xs font-bold text-stone-400">${calculatedTime}</span>
-                                        <span class="text-xs font-extrabold text-emerald-600">(${meal.protein}g חלבון)</span>
-                                    </div>
-                                    <h4 class="text-sm font-extrabold text-stone-800">${meal.name || 'ארוחה קלה'}</h4>
-                                </div>
-                                <p class="text-stone-600 text-sm leading-relaxed">${meal.desc}</p>
-                                
-                                <!-- Chef cooking tip -->
-                                <div class="mt-2 p-2 bg-amber-50/50 rounded-lg border border-amber-100/60 flex items-start gap-1.5 text-xs text-amber-800">
-                                    <i data-lucide="chef-hat" class="w-4 h-4 text-amber-600 shrink-0 mt-0.5"></i>
-                                    <div><strong>טיפ להכנה מנצחת:</strong> ${meal.tip}</div>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                    mealsContainer.appendChild(mealDiv);
-                });
-
-                outputCont.classList.remove('opacity-0', 'scale-95');
-                outputCont.classList.add('opacity-100', 'scale-100');
-                
-                // Trigger dynamic icons render
-                lucide.createIcons();
-                updateProteinTracker();
-                
-                // Smooth scroll to output container
-                outputCont.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-            }, 150);
-        }
-
-        function rollMenu() {
-            let randomIndex;
-            do {
-                randomIndex = Math.floor(Math.random() * menus.length);
-            } while (randomIndex === currentActiveMenuIndex && menus.length > 1);
-
-            currentActiveMenuIndex = randomIndex;
-            
-            // Sync dropdown select visual
-            document.getElementById('directMenuSelect').value = randomIndex;
-            
-            renderMenu(randomIndex);
-        }
-
-        function loadSelectedMenu(indexVal) {
-            const index = parseInt(indexVal);
-            if (!isNaN(index)) {
-                currentActiveMenuIndex = index;
-                renderMenu(index);
+            // Check if last question
+            if(currentQuestionIndex === questions.length - 1) {
+                document.getElementById('next-btn').innerHTML = 'סיים מבחן וצפה בתוצאות <i class="fa-solid fa-flag-checkered mr-2"></i>';
+                document.getElementById('next-btn').classList.replace('hover:bg-white/20', 'bg-violet-600');
             }
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            if(currentQuestionIndex < questions.length) {
+                loadQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function showResults() {
+            quizScreen.classList.add('hidden');
+            quizScreen.classList.remove('flex');
+            resultScreen.classList.remove('hidden');
+            
+            document.getElementById('final-score').textContent = score;
+            const percentage = (score / questions.length) * 100;
+            
+            const title = document.getElementById('result-title');
+            const subtitle = document.getElementById('result-subtitle');
+            const icon = document.getElementById('result-icon');
+            const iconCont = document.getElementById('result-icon-container');
+
+            if(percentage >= 90) {
+                title.textContent = "מאסטר דאטה!";
+                subtitle.textContent = "רמת הידע שלך פנומנלית. אתה מוכן למבחן ולתעשייה.";
+                icon.className = "fa-solid fa-crown text-yellow-400 drop-shadow-[0_0_15px_rgba(250,204,21,0.8)]";
+                iconCont.className = "inline-block p-6 rounded-full mb-6 border-4 border-yellow-400/30 bg-yellow-400/10";
+            } else if(percentage >= 70) {
+                title.textContent = "עבודה טובה מאוד!";
+                subtitle.textContent = "שליטה חזקה בחומר. חזרה קטנה על מקרי הקיצון וזה יהיה מושלם.";
+                icon.className = "fa-solid fa-medal text-cyan-400 drop-shadow-[0_0_15px_rgba(6,182,212,0.8)]";
+                iconCont.className = "inline-block p-6 rounded-full mb-6 border-4 border-cyan-400/30 bg-cyan-400/10";
+            } else if(percentage >= 50) {
+                title.textContent = "לא רע, אבל יש מה לשפר";
+                subtitle.textContent = "יש לך את הבסיס, אבל השאלות המכשילות הפילו אותך. מומלץ לחזור על הסיכומים.";
+                icon.className = "fa-solid fa-book-open text-violet-400 drop-shadow-[0_0_15px_rgba(139,92,246,0.8)]";
+                iconCont.className = "inline-block p-6 rounded-full mb-6 border-4 border-violet-400/30 bg-violet-400/10";
+            } else {
+                title.textContent = "דרוש חישוב מסלול מחדש";
+                subtitle.textContent = "החומר התיאורטי והקוד עדיין לא יושבים מספיק טוב. זה הזמן לשבת על ה-Cheat Sheet!";
+                icon.className = "fa-solid fa-triangle-exclamation text-red-400 drop-shadow-[0_0_15px_rgba(248,113,113,0.8)]";
+                iconCont.className = "inline-block p-6 rounded-full mb-6 border-4 border-red-400/30 bg-red-400/10";
+            }
+        }
+
+        function shareResults() {
+            const percentage = Math.round((score / questions.length) * 100);
+            const text = `סיימתי את 'אתגר מדע הנתונים' עם ${score}/${questions.length} (${percentage}%)! 🚀💻\nחושב שאתה יכול לעקוף אותי?`;
+            
+            navigator.clipboard.writeText(text).then(() => {
+                const toast = document.getElementById('share-toast');
+                toast.classList.remove('opacity-0');
+                setTimeout(() => toast.classList.add('opacity-0'), 3000);
+            }).catch(err => {
+                // Fallback for older browsers / iframe restrictions
+                const textArea = document.createElement("textarea");
+                textArea.value = text;
+                document.body.appendChild(textArea);
+                textArea.select();
+                try {
+                    document.execCommand('copy');
+                    const toast = document.getElementById('share-toast');
+                    toast.classList.remove('opacity-0');
+                    setTimeout(() => toast.classList.add('opacity-0'), 3000);
+                } catch (err) {
+                    console.error('Fallback: Oops, unable to copy', err);
+                }
+                document.body.removeChild(textArea);
+            });
         }
     </script>
 </body>
